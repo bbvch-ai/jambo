@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Project Files Minus Problematic" pattern="!file:tests/parser/test_allof_type_parser.py&amp;&amp;!file:jambo/parser/allof_type_parser.py" />
-</component>
