@@ -1,7 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import EmailStr, HttpUrl, IPvAnyAddress
+from pydantic import EmailStr, HttpUrl, IPvAnyAddress, FilePath
 from typing_extensions import Unpack
 
 from datetime import date, datetime, time
@@ -28,6 +28,7 @@ class StringTypeParser(GenericTypeParser):
         "time": time,
         "date-time": datetime,
         "binary": bytes,
+        "file-path": FilePath,  # Added file-path format
     }
 
     format_pattern_mapping = {
