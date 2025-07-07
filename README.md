@@ -37,6 +37,7 @@ Created to simplifying the process of dynamically generating Pydantic models for
     - nested objects
     - allOf
     - anyOf
+    - oneOf
     - ref
     - enum
     - const
@@ -151,6 +152,43 @@ schema = {
 Model = SchemaConverter.build(schema)
 obj = Model(address={"street": "Main St", "city": "Gotham"})
 print(obj)
+```
+
+### OneOf Validation
+
+```python
+from jambo import SchemaConverter
+
+
+schema = {
+    "title": "Contact",
+    "type": "object",
+    "properties": {
+        "id": {
+            "oneOf": [
+                {"type": "integer", "minimum": 1},
+                {"type": "string", "pattern": "^[A-Z]{2}[0-9]{4}$"},
+            ]
+        },
+    },
+    "required": ["id"],
+}
+
+Model = SchemaConverter.build(schema)
+
+# Valid: matches integer schema
+obj1 = Model(id=123)
+print(obj1)
+
+# Valid: matches string pattern schema  
+obj2 = Model(id="AB1234")
+print(obj2)
+
+# Invalid: matches neither schema
+try:
+    obj3 = Model(id="invalid")
+except ValueError as e:
+    print(f"Validation error: {e}")
 ```
 
 ### References

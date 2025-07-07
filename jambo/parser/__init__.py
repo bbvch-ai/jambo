@@ -9,6 +9,7 @@ from .float_type_parser import FloatTypeParser
 from .int_type_parser import IntTypeParser
 from .null_type_parser import NullTypeParser
 from .object_type_parser import ObjectTypeParser
+from .oneof_type_parser import OneOfTypeParser
 from .ref_type_parser import RefTypeParser
 from .string_type_parser import StringTypeParser
 
@@ -25,6 +26,7 @@ __all__ = [
     "IntTypeParser",
     "NullTypeParser",
     "ObjectTypeParser",
+    "OneOfTypeParser",
     "StringTypeParser",
     "RefTypeParser",
 ]
