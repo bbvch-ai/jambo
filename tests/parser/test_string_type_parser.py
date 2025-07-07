@@ -1,6 +1,6 @@
 from jambo.parser import StringTypeParser
 
-from pydantic import EmailStr, HttpUrl, IPvAnyAddress
+from pydantic import EmailStr, HttpUrl, IPvAnyAddress, FilePath
 
 from datetime import date, datetime, time
 from unittest import TestCase
@@ -158,6 +158,18 @@ class TestStringTypeParser(TestCase):
             self.assertEqual(
                 type_validator["pattern"], parser.format_pattern_mapping[format_type]
             )
+
+    def test_string_parser_with_file_path_format(self):
+        parser = StringTypeParser()
+
+        properties = {
+            "type": "string",
+            "format": "file-path",
+        }
+
+        type_parsing, type_validator = parser.from_properties("placeholder", properties)
+
+        self.assertEqual(type_parsing, FilePath)
 
     def test_string_parser_with_unsupported_format(self):
         parser = StringTypeParser()
