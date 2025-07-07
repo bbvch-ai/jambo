@@ -197,3 +197,18 @@ class TestStringTypeParser(TestCase):
         type_parsing, type_validator = parser.from_properties("placeholder", properties)
 
         self.assertEqual(type_parsing, datetime)
+
+    def test_string_parser_with_byte_format(self):
+        parser = StringTypeParser()
+
+        properties = {
+            "type": "string",
+            "format": "binary",
+        }
+
+        type_parsing, type_validator = parser.from_properties("placeholder", properties)
+
+        self.assertEqual(type_parsing, bytes)
+
+        self.assertIn("json_schema_extra", type_validator)
+        self.assertEqual(type_validator["json_schema_extra"]["format"], "binary")
