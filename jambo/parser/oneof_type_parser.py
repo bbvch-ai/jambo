@@ -1,7 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import Field, AfterValidator
+from pydantic import Field, BeforeValidator, TypeAdapter, ValidationError
 from typing_extensions import Annotated, Union, Unpack, Any
 
 
@@ -36,28 +36,34 @@ class OneOfTypeParser(GenericTypeParser):
             for t, v in sub_types
         ]
 
+        union_type = Union[(*field_types,)]
+
+        discriminator = properties.get("discriminator")
+        if discriminator and isinstance(discriminator, dict):
+            property_name = discriminator.get("propertyName")
+            if property_name:
+                validated_type = Annotated[union_type, Field(discriminator=property_name)]
+                return validated_type, mapped_properties
+
         def validate_one_of(value: Any) -> Any:
-            valid_count = 0
-            last_valid_value = None
+            matched_count = 0
+            validation_errors = []
 
             for field_type in field_types:
                 try:
                     adapter = TypeAdapter(field_type)
-                    validated_value = adapter.validate_python(value)
-                    valid_count += 1
-                    last_valid_value = validated_value
-                except ValidationError:
+                    adapter.validate_python(value)
+                    matched_count += 1
+                except ValidationError as e:
+                    validation_errors.append(str(e))
                     continue
 
-            if valid_count == 0:
-                raise ValueError(f"Value {value} does not match any of the oneOf schemas")
-            elif valid_count > 1:
-                raise ValueError(f"Value {value} matches more than one oneOf schema (exactly one required)")
+            if matched_count == 0:
+                raise ValueError(f"Value does not match any of the oneOf schemas")
+            elif matched_count > 1:
+                raise ValueError(f"Value matches multiple oneOf schemas, exactly one expected")
 
-            return last_valid_value
+            return value
 
-        # Apply the oneOf validator to the Union type
-        union_type = Union[(*field_types,)]
-        validated_type = Annotated[union_type, AfterValidator(validate_one_of)]
-
+        validated_type = Annotated[union_type, BeforeValidator(validate_one_of)]
         return validated_type, mapped_properties
