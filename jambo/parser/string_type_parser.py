@@ -27,6 +27,7 @@ class StringTypeParser(GenericTypeParser):
         "date": date,
         "time": time,
         "date-time": datetime,
+        "binary": bytes,
     }
 
     format_pattern_mapping = {
