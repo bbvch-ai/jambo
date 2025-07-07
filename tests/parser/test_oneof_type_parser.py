@@ -409,3 +409,85 @@ class TestOneOfTypeParser(TestCase):
         with self.assertRaises(ValueError) as cm:
             Model(value={"data": "test"})
         self.assertIn("matches multiple oneOf schemas", str(cm.exception))
+
+        def test_oneof_overlapping_strings_from_docs(self):
+            """Test the overlapping strings example from documentation"""
+            schema = {
+                "title": "SimpleExample",
+                "type": "object",
+                "properties": {
+                    "value": {
+                        "oneOf": [
+                            {"type": "string", "maxLength": 6},
+                            {"type": "string", "minLength": 4}
+                        ]
+                    }
+                },
+                "required": ["value"]
+            }
+
+            Model = SchemaConverter.build(schema)
+
+            # Valid: Short string (matches first schema only)
+            obj1 = Model(value="hi")
+            self.assertEqual(obj1.value, "hi")
+
+            # Valid: Long string (matches second schema only)
+            obj2 = Model(value="very long string")
+            self.assertEqual(obj2.value, "very long string")
+
+            # Invalid: Medium string (matches BOTH schemas - violates oneOf)
+            with self.assertRaises(ValueError) as cm:
+                Model(value="hello")  # 5 chars: matches maxLength=6 AND minLength=4
+            self.assertIn("matches multiple oneOf schemas", str(cm.exception))
+
+        def test_oneof_shapes_discriminator_from_docs(self):
+            """Test the shapes discriminator example from documentation"""
+            schema = {
+                "title": "Shape",
+                "type": "object",
+                "properties": {
+                    "shape": {
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {"const": "circle"},
+                                    "radius": {"type": "number", "minimum": 0}
+                                },
+                                "required": ["type", "radius"]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {"const": "rectangle"},
+                                    "width": {"type": "number", "minimum": 0},
+                                    "height": {"type": "number", "minimum": 0}
+                                },
+                                "required": ["type", "width", "height"]
+                            }
+                        ],
+                        "discriminator": {
+                            "propertyName": "type"
+                        }
+                    }
+                },
+                "required": ["shape"]
+            }
+
+            Model = SchemaConverter.build(schema)
+
+            # Valid: Circle
+            circle = Model(shape={"type": "circle", "radius": 5.0})
+            self.assertEqual(circle.shape.type, "circle")
+            self.assertEqual(circle.shape.radius, 5.0)
+
+            # Valid: Rectangle
+            rectangle = Model(shape={"type": "rectangle", "width": 10, "height": 20})
+            self.assertEqual(rectangle.shape.type, "rectangle")
+            self.assertEqual(rectangle.shape.width, 10)
+            self.assertEqual(rectangle.shape.height, 20)
+
+            # Invalid: Wrong properties for the type
+            with self.assertRaises(ValueError):
+                Model(shape={"type": "circle", "width": 10})
