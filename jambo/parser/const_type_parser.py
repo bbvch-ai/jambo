@@ -3,7 +3,7 @@ from jambo.types.json_schema_type import JSONSchemaNativeTypes
 from jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import AfterValidator
-from typing_extensions import Annotated, Any, Unpack
+from typing_extensions import Annotated, Any, Literal, Unpack
 
 
 class ConstTypeParser(GenericTypeParser):
@@ -33,11 +33,19 @@ class ConstTypeParser(GenericTypeParser):
         return const_type, parsed_properties
 
     def _build_const_type(self, const_value):
-        def _validate_const_value(value: Any) -> Any:
-            if value != const_value:
-                raise ValueError(
-                    f"Value must be equal to the constant value: {const_value}"
-                )
-            return value
+        # Try to use Literal for hashable types (required for discriminated unions)
+        # Fall back to validator approach for non-hashable types
+        try:
+            # Test if the value is hashable (can be used in Literal)
+            hash(const_value)
+            return Literal[const_value]
+        except TypeError:
+            # Non-hashable type (like list, dict), use validator approach
+            def _validate_const_value(value: Any) -> Any:
+                if value != const_value:
+                    raise ValueError(
+                        f"Value must be equal to the constant value: {const_value}"
+                    )
+                return value
 
-        return Annotated[type(const_value), AfterValidator(_validate_const_value)]
+            return Annotated[type(const_value), AfterValidator(_validate_const_value)]
