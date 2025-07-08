@@ -1,6 +1,6 @@
 from jambo.parser import ConstTypeParser
 
-from typing_extensions import Annotated, Literal, get_args, get_origin
+from typing import Annotated, Literal, get_args, get_origin
 
 from unittest import TestCase
 

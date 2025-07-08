@@ -1,6 +1,6 @@
 from jambo.types.json_schema_type import JSONSchema
 
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 
 class TypeParserOptions(TypedDict):

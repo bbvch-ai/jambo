@@ -3,7 +3,7 @@ from jambo.types.json_schema_type import JSONSchemaNativeTypes
 from jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import AfterValidator
-from typing_extensions import Annotated, Any, Literal, Unpack
+from typing import Annotated, Any, Literal, Unpack
 
 
 class ConstTypeParser(GenericTypeParser):

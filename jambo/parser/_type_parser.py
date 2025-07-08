@@ -1,7 +1,7 @@
 from jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import Field, TypeAdapter
-from typing_extensions import Annotated, Any, Generic, Self, TypeVar, Unpack
+from typing import Annotated, Any, Generic, Self, TypeVar, Unpack
 
 from abc import ABC, abstractmethod
 
@@ -47,7 +47,7 @@ class GenericTypeParser(ABC, Generic[T]):
 
         if not self._validate_default(parsed_type, parsed_properties):
             raise ValueError(
-                f"Default value {properties.get('default')} is not valid for type {parsed_type.__name__}"
+                f"Default value {properties.get('default')} is not valid for type {parsed_type}"
             )
 
         return parsed_type, parsed_properties

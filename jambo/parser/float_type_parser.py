@@ -1,7 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from typing_extensions import Unpack
+from typing import Unpack
 
 
 class FloatTypeParser(GenericTypeParser):

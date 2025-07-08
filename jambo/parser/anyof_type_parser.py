@@ -2,11 +2,14 @@ from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import Field
-from typing_extensions import Annotated, Union, Unpack
+from typing import Annotated, Unpack
+from types import UnionType
+from functools import reduce
+from operator import or_
 
 
 class AnyOfTypeParser(GenericTypeParser):
-    mapped_type = Union
+    mapped_type = UnionType
 
     json_schema_type = "anyOf"
 
@@ -41,4 +44,6 @@ class AnyOfTypeParser(GenericTypeParser):
             for t, v in sub_types
         ]
 
-        return Union[(*field_types,)], mapped_properties
+        union_type = reduce(or_, field_types)
+
+        return union_type, mapped_properties

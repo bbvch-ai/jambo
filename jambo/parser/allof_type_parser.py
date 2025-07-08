@@ -1,7 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from typing_extensions import Any, Unpack
+from typing import Any, Unpack
 
 
 class AllOfTypeParser(GenericTypeParser):
