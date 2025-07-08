@@ -1,12 +1,15 @@
+from types import UnionType
+
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import Field, BeforeValidator, TypeAdapter, ValidationError
-from typing_extensions import Annotated, Union, Unpack, Any
-
+from typing import Annotated, Unpack, Any
+from functools import reduce
+from operator import or_
 
 class OneOfTypeParser(GenericTypeParser):
-    mapped_type = Union
+    mapped_type = UnionType
 
     json_schema_type = "oneOf"
 
@@ -36,7 +39,7 @@ class OneOfTypeParser(GenericTypeParser):
             for t, v in sub_types
         ]
 
-        union_type = Union[(*field_types,)]
+        union_type = reduce(or_, field_types)
 
         discriminator = properties.get("discriminator")
         if discriminator and isinstance(discriminator, dict):

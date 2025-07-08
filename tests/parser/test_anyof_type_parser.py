@@ -1,6 +1,6 @@
 from jambo.parser.anyof_type_parser import AnyOfTypeParser
 
-from typing_extensions import Annotated, Union, get_args, get_origin
+from typing import Annotated, get_args, get_origin
 
 from unittest import TestCase
 
@@ -42,7 +42,7 @@ class TestAnyOfTypeParser(TestCase):
         )
 
         # check union type has string and int
-        self.assertEqual(get_origin(type_parsing), Union)
+        self.assertEqual(get_origin(type_parsing), type(str | int))
 
         type_1, type_2 = get_args(type_parsing)
 
@@ -67,7 +67,7 @@ class TestAnyOfTypeParser(TestCase):
         )
 
         # check union type has string and int
-        self.assertEqual(get_origin(type_parsing), Union)
+        self.assertEqual(get_origin(type_parsing), type(str | int))
 
         type_1, type_2 = get_args(type_parsing)
 

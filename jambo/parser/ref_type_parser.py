@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from jambo.parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from typing_extensions import Any, ForwardRef, Literal, TypeVar, Union, Unpack
+from typing import Any, ForwardRef, Literal, TypeVar, Unpack
 
 
-RefType = TypeVar("RefType", bound=Union[type, ForwardRef])
+RefType = TypeVar("RefType", bound=type | ForwardRef)
 
 RefStrategy = Literal["forward_ref", "def_ref"]
 

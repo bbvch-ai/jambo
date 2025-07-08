@@ -1,6 +1,6 @@
 from jambo.parser import ArrayTypeParser
 
-from typing_extensions import get_args
+from typing import get_args
 
 from unittest import TestCase
 

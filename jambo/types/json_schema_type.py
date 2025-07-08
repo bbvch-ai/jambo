@@ -1,4 +1,6 @@
-from typing_extensions import Dict, List, Literal, TypedDict, Union
+from __future__ import annotations
+
+from typing import Dict, List, Literal, TypedDict
 
 from types import NoneType
 
@@ -19,7 +21,7 @@ JSONSchemaNativeTypes: tuple[type, ...] = (
 )
 
 
-JSONType = Union[str, int, float, bool, None, Dict[str, "JSONType"], List["JSONType"]]
+JSONType = str | int | float | bool | None | Dict[str, "JSONType"] | List["JSONType"]
 
 
 class JSONSchema(TypedDict, total=False):
@@ -30,20 +32,20 @@ class JSONSchema(TypedDict, total=False):
     examples: List[JSONType]
 
     # Type definitions
-    type: Union[JSONSchemaType, List[JSONSchemaType]]
+    type: JSONSchemaType | List[JSONSchemaType]
 
     # Object-specific keywords
     properties: Dict[str, "JSONSchema"]
     required: List[str]
-    additionalProperties: Union[bool, "JSONSchema"]
+    additionalProperties: bool | "JSONSchema"
     minProperties: int
     maxProperties: int
     patternProperties: Dict[str, "JSONSchema"]
-    dependencies: Dict[str, Union[List[str], "JSONSchema"]]
+    dependencies: Dict[str, List[str] | "JSONSchema"]
 
     # Array-specific keywords
-    items: Union["JSONSchema", List["JSONSchema"]]
-    additionalItems: Union[bool, "JSONSchema"]
+    items: "JSONSchema" | List["JSONSchema"]
+    additionalItems: bool | "JSONSchema"
     minItems: int
     maxItems: int
     uniqueItems: bool
@@ -79,11 +81,11 @@ class JSONSchema(TypedDict, total=False):
 
 # Fix forward references
 JSONSchema.__annotations__["properties"] = Dict[str, JSONSchema]
-JSONSchema.__annotations__["items"] = Union[JSONSchema, List[JSONSchema]]
-JSONSchema.__annotations__["additionalItems"] = Union[bool, JSONSchema]
-JSONSchema.__annotations__["additionalProperties"] = Union[bool, JSONSchema]
+JSONSchema.__annotations__["items"] = JSONSchema | List[JSONSchema]
+JSONSchema.__annotations__["additionalItems"] = bool | JSONSchema
+JSONSchema.__annotations__["additionalProperties"] = bool | JSONSchema
 JSONSchema.__annotations__["patternProperties"] = Dict[str, JSONSchema]
-JSONSchema.__annotations__["dependencies"] = Dict[str, Union[List[str], JSONSchema]]
+JSONSchema.__annotations__["dependencies"] = Dict[str, List[str] | JSONSchema]
 JSONSchema.__annotations__["if_"] = JSONSchema
 JSONSchema.__annotations__["then"] = JSONSchema
 JSONSchema.__annotations__["else_"] = JSONSchema
