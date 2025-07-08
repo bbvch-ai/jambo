@@ -127,17 +127,6 @@ class GenericTypeParser(ABC, Generic[T]):
 
     @staticmethod
     def _has_meaningful_constraints(field_props):
-        """
-        Check if field properties contain meaningful constraints that require Field wrapping.
-
-        Returns False if:
-        - field_props is None or empty
-        - field_props only contains {'default': None}
-
-        Returns True if:
-        - field_props contains a non-None default value
-        - field_props contains other constraint properties (min_length, max_length, pattern, etc.)
-        """
         if not field_props:
             return False
 

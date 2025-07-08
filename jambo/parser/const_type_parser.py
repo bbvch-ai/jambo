@@ -33,14 +33,10 @@ class ConstTypeParser(GenericTypeParser):
         return const_type, parsed_properties
 
     def _build_const_type(self, const_value):
-        # Try to use Literal for hashable types (required for discriminated unions)
-        # Fall back to validator approach for non-hashable types
         try:
-            # Test if the value is hashable (can be used in Literal)
             hash(const_value)
             return Literal[const_value]
         except TypeError:
-            # Non-hashable type (like list, dict), use validator approach
             def _validate_const_value(value: Any) -> Any:
                 if value != const_value:
                     raise ValueError(
