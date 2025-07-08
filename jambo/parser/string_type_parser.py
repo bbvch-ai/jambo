@@ -28,7 +28,7 @@ class StringTypeParser(GenericTypeParser):
         "time": time,
         "date-time": datetime,
         "binary": bytes,
-        "file-path": FilePath,  # Added file-path format
+        "file-path": FilePath,
     }
 
     format_pattern_mapping = {
