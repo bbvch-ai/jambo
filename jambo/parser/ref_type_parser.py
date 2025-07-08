@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from jambo.parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
