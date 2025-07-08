@@ -35,17 +35,17 @@ class JSONSchema(TypedDict, total=False):
     type: JSONSchemaType | list[JSONSchemaType]
 
     # Object-specific keywords
-    properties: dict[str, "JSONSchema"]
+    properties: dict[str, JSONSchema]
     required: list[str]
-    additionalProperties: bool | "JSONSchema"
+    additionalProperties: bool | JSONSchema
     minProperties: int
     maxProperties: int
-    patternProperties: dict[str, "JSONSchema"]
-    dependencies: dict[str, list[str] | "JSONSchema"]
+    patternProperties: dict[str, JSONSchema]
+    dependencies: dict[str, list[str] | JSONSchema]
 
     # Array-specific keywords
-    items: "JSONSchema" | list["JSONSchema"]
-    additionalItems: bool | "JSONSchema"
+    items: JSONSchema | list[JSONSchema]
+    additionalItems: bool | JSONSchema
     minItems: int
     maxItems: int
     uniqueItems: bool
@@ -68,15 +68,15 @@ class JSONSchema(TypedDict, total=False):
     const: JSONType
 
     # Conditionals
-    if_: "JSONSchema"  # 'if' is a reserved word in Python
-    then: "JSONSchema"
-    else_: "JSONSchema"  # 'else' is also a reserved word
+    if_: JSONSchema  # 'if' is a reserved word in Python
+    then: JSONSchema
+    else_: JSONSchema  # 'else' is also a reserved word
 
     # Combination keywords
-    allOf: list["JSONSchema"]
-    anyOf: list["JSONSchema"]
-    oneOf: list["JSONSchema"]
-    not_: "JSONSchema"  # 'not' is a reserved word
+    allOf: list[JSONSchema]
+    anyOf: list[JSONSchema]
+    oneOf: list[JSONSchema]
+    not_: JSONSchema  # 'not' is a reserved word
 
 
 # Fix forward references
