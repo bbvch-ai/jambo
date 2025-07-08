@@ -351,32 +351,26 @@ class TestOneOfTypeParser(TestCase):
                             }
                         }
                     ],
-                    "discriminator": {}  # discriminator without propertyName
+                    "discriminator": {}
                 }
             }
         }
 
         Model = SchemaConverter.build(schema)
 
-        # Should succeed because input matches exactly one schema (the first one)
-        # The first schema matches: type="a" matches const("a"), value="test" is a string
-        # The second schema doesn't match: type="a" does not match const("b")
         obj = Model(value={"type": "a", "value": "test", "extra": "invalid"})
         self.assertEqual(obj.value.type, "a")
         self.assertEqual(obj.value.value, "test")
 
-        # Test with input that matches the second schema
         obj2 = Model(value={"type": "b", "value": 42})
         self.assertEqual(obj2.value.type, "b")
         self.assertEqual(obj2.value.value, 42)
 
-        # Test with input that matches neither schema (should fail)
         with self.assertRaises(ValueError) as cm:
             Model(value={"type": "c", "value": "test"})
         self.assertIn("does not match any of the oneOf schemas", str(cm.exception))
 
     def test_oneof_multiple_matches_without_discriminator(self):
-        """Test case where input genuinely matches multiple oneOf schemas"""
         schema = {
             "title": "Test",
             "type": "object",
@@ -397,14 +391,13 @@ class TestOneOfTypeParser(TestCase):
                             }
                         }
                     ],
-                    "discriminator": {}  # discriminator without propertyName
+                    "discriminator": {}
                 }
             }
         }
 
         Model = SchemaConverter.build(schema)
 
-        # This input matches both schemas since both accept data as string
         # and neither requires specific additional properties
         with self.assertRaises(ValueError) as cm:
             Model(value={"data": "test"})
