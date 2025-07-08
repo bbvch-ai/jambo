@@ -141,9 +141,6 @@ class GenericTypeParser(ABC, Generic[T]):
         if not field_props:
             return False
 
-        # If only default is set and it's None, no meaningful constraints
         if field_props == {"default": None}:
             return False
-
-        # If there are multiple properties or non-None default, that's meaningful
         return True
