@@ -12,7 +12,7 @@ class TestConstTypeParser(TestCase):
         parser = ConstTypeParser()
 
         expected_const_value = "United States of America"
-        properties = {"const": expected_const_value}
+        properties = {"const": expected_const_value, "examples": [expected_const_value]}
 
         parsed_type, parsed_properties = parser.from_properties_impl(
             "country", properties
@@ -23,13 +23,14 @@ class TestConstTypeParser(TestCase):
         self.assertEqual(get_args(parsed_type), (expected_const_value,))
 
         self.assertEqual(parsed_properties["default"], expected_const_value)
+        self.assertEqual(parsed_properties["examples"], [expected_const_value])
 
     def test_const_type_parser_non_hashable_value(self):
         """Test const parser with non-hashable values (uses Annotated with validator)"""
         parser = ConstTypeParser()
 
         expected_const_value = [1, 2, 3]  # Lists are not hashable
-        properties = {"const": expected_const_value}
+        properties = {"const": expected_const_value, "examples": [expected_const_value]}
 
         parsed_type, parsed_properties = parser.from_properties_impl(
             "list_const", properties
@@ -40,13 +41,14 @@ class TestConstTypeParser(TestCase):
         self.assertIn(list, get_args(parsed_type))
 
         self.assertEqual(parsed_properties["default"], expected_const_value)
+        self.assertEqual(parsed_properties["examples"], [expected_const_value])
 
     def test_const_type_parser_integer_value(self):
         """Test const parser with integer values (uses Literal)"""
         parser = ConstTypeParser()
 
         expected_const_value = 42
-        properties = {"const": expected_const_value}
+        properties = {"const": expected_const_value, "examples": [expected_const_value]}
 
         parsed_type, parsed_properties = parser.from_properties_impl(
             "int_const", properties
@@ -57,13 +59,14 @@ class TestConstTypeParser(TestCase):
         self.assertEqual(get_args(parsed_type), (expected_const_value,))
 
         self.assertEqual(parsed_properties["default"], expected_const_value)
+        self.assertEqual(parsed_properties["examples"], [expected_const_value])
 
     def test_const_type_parser_boolean_value(self):
         """Test const parser with boolean values (uses Literal)"""
         parser = ConstTypeParser()
 
         expected_const_value = True
-        properties = {"const": expected_const_value}
+        properties = {"const": expected_const_value, "examples": [expected_const_value]}
 
         parsed_type, parsed_properties = parser.from_properties_impl(
             "bool_const", properties
@@ -74,6 +77,7 @@ class TestConstTypeParser(TestCase):
         self.assertEqual(get_args(parsed_type), (expected_const_value,))
 
         self.assertEqual(parsed_properties["default"], expected_const_value)
+        self.assertEqual(parsed_properties["examples"], [expected_const_value])
 
     def test_const_type_parser_invalid_properties(self):
         parser = ConstTypeParser()

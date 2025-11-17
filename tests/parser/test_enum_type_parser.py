@@ -89,3 +89,27 @@ class TestEnumTypeParser(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             parser.from_properties_impl("TestEnum", schema)
+
+    def test_enum_type_parser_creates_enum_with_examples(self):
+        parser = EnumTypeParser()
+
+        schema = {
+            "enum": ["value1", "value2", "value3"],
+            "examples": ["value1", "value3"],
+        }
+
+        parsed_type, parsed_properties = parser.from_properties_impl(
+            "TestEnum",
+            schema,
+        )
+
+        self.assertIsInstance(parsed_type, type)
+        self.assertTrue(issubclass(parsed_type, Enum))
+        self.assertEqual(
+            set(parsed_type.__members__.keys()), {"VALUE1", "VALUE2", "VALUE3"}
+        )
+        self.assertEqual(parsed_properties["default"], None)
+        self.assertEqual(
+            parsed_properties["examples"],
+            [getattr(parsed_type, "VALUE1"), getattr(parsed_type, "VALUE3")],
+        )

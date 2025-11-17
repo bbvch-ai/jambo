@@ -23,6 +23,7 @@ class TestIntTypeParser(TestCase):
             "maximum": 10,
             "minimum": 1,
             "multipleOf": 2,
+            "examples": [2, 4],
         }
 
         type_parsing, type_validator = parser.from_properties("placeholder", properties)
@@ -31,6 +32,7 @@ class TestIntTypeParser(TestCase):
         self.assertEqual(type_validator["le"], 10)
         self.assertEqual(type_validator["ge"], 1)
         self.assertEqual(type_validator["multiple_of"], 2)
+        self.assertEqual(type_validator["examples"], [2, 4])
 
     def test_int_parser_with_default(self):
         parser = IntTypeParser()

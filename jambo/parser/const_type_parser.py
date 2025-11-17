@@ -13,6 +13,7 @@ class ConstTypeParser(GenericTypeParser):
     default_mappings = {
         "const": "default",
         "description": "description",
+        "examples": "examples",
     }
 
     def from_properties_impl(
