@@ -63,7 +63,6 @@ class StringTypeParser(GenericTypeParser):
         if format_type in self.format_pattern_mapping:
             mapped_properties["pattern"] = self.format_pattern_mapping[format_type]
 
-        print("A")
         if "examples" in mapped_properties:
             mapped_properties["examples"] = [
                 self.__parse_example(example, format_type, mapped_type)
