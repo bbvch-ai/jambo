@@ -19,6 +19,8 @@ class GenericTypeParser(ABC, Generic[T]):
         "default": "default",
         "description": "description",
         "examples": "examples",
+        "title": "title",
+        "deprecated": "deprecated",
     }
 
     @abstractmethod
