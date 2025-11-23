@@ -22,6 +22,44 @@ class TestObjectTypeParser(TestCase):
         self.assertEqual(obj.name, "name")
         self.assertEqual(obj.age, 10)
 
+    def test_object_type_parser_with_object_example(self):
+        parser = ObjectTypeParser()
+
+        properties = {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street": {"type": "string"},
+                        "city": {"type": "string"},
+                    },
+                    "examples": [
+                        {
+                            "street": "123 Main St",
+                            "city": "Anytown",
+                        }
+                    ],
+                },
+            },
+        }
+
+        parsed_type, type_validator = parser.from_properties_impl(
+            "placeholder", properties
+        )
+
+        model_schema = parsed_type.model_json_schema()
+
+        # # Check example value
+        address_schema = model_schema["properties"]["address"]
+        self.assertIn("examples", address_schema)
+
+        example_address = address_schema["examples"][0]
+        self.assertEqual(example_address["street"], "123 Main St")
+        self.assertEqual(example_address["city"], "Anytown")
+
     def test_object_type_parser_with_default(self):
         parser = ObjectTypeParser()
 

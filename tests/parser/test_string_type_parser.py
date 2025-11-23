@@ -288,6 +288,17 @@ class TestStringTypeParser(TestCase):
             ],
         )
 
+    def test_string_parser_with_invalid_example_value(self):
+        with self.assertRaises(InvalidSchemaException):
+            StringTypeParser().from_properties(
+                "placeholder",
+                {
+                    "type": "string",
+                    "format": "email",
+                    "examples": ["invalid-email"],
+                },
+            )
+
     @unittest.skip("Duration parsing not yet implemented")
     def test_string_parser_with_timedelta_format(self):
         parser = StringTypeParser()
@@ -310,14 +321,3 @@ class TestStringTypeParser(TestCase):
                 timedelta(seconds=0.5),
             ],
         )
-
-    def test_string_parser_with_invalid_example_value(self):
-        with self.assertRaises(InvalidSchemaException):
-            StringTypeParser().from_properties(
-                "placeholder",
-                {
-                    "type": "string",
-                    "format": "email",
-                    "examples": ["invalid-email"],
-                },
-            )
