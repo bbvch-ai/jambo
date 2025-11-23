@@ -3,23 +3,14 @@ from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
 from typing_extensions import (
-    Callable,
-    Generic,
     Iterable,
-    Optional,
-    TypeVar,
-    Union,
     Unpack,
 )
 
 import copy
 
 
-V = TypeVar("V")
-T = TypeVar("T", bound=list)
-
-
-class ArrayTypeParser(GenericTypeParser, Generic[T, V]):
+class ArrayTypeParser(GenericTypeParser):
     mapped_type = list
 
     json_schema_type = "type:array"
@@ -57,18 +48,14 @@ class ArrayTypeParser(GenericTypeParser, Generic[T, V]):
                 default_value, wrapper_type
             )
 
-        if (
-            example_values := mapped_properties.pop("example_values", None)
-        ) is not None:
+        if (example_values := mapped_properties.pop("examples", None)) is not None:
             mapped_properties["examples"] = [
                 wrapper_type(example) for example in example_values
             ]
 
         return field_type, mapped_properties
 
-    def _build_default_factory(
-        self, default_list: Optional[Iterable[V]], wrapper_type: type[V]
-    ) -> Callable[[], Union[V, None]]:
+    def _build_default_factory(self, default_list, wrapper_type):
         if default_list is None:
             return lambda: None
 
