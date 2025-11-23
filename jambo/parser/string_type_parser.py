@@ -65,7 +65,7 @@ class StringTypeParser(GenericTypeParser):
 
         if "examples" in mapped_properties:
             mapped_properties["examples"] = [
-                self.__parse_example(example, format_type, mapped_type)
+                self._parse_example(example, format_type, mapped_type)
                 for example in mapped_properties["examples"]
             ]
 
@@ -75,7 +75,7 @@ class StringTypeParser(GenericTypeParser):
 
         return mapped_type, mapped_properties
 
-    def __parse_example(
+    def _parse_example(
         self, example: Any, format_type: str, mapped_type: type[Any]
     ) -> Any:
         """

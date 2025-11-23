@@ -25,7 +25,7 @@ readme = "README.md"
 dependencies = [
     "email-validator>=2.2.0",
     "jsonschema>=4.23.0",
-    "pydantic>=2.10.6",
+    "pydantic>=2.12.4",
 ]
 
 [dependency-groups]
@@ -46,6 +46,11 @@ dev = [
 [project.urls]
 homepage = "https://github.com/HideyoshiNakazone/jambo"
 repository = "https://github.com/HideyoshiNakazone/jambo.git"
+
+[project.optional-dependencies]
+str-fmt = [
+    "isodate>=0.7.2",
+]
 
 
 # POE Tasks
