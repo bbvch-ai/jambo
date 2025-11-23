@@ -485,3 +485,38 @@ class TestRefTypeParser(TestCase):
 
         self.assertEqual(obj.name, "John")
         self.assertEqual(obj.age, 30)
+
+    def test_ref_type_parser_with_def_with_examples(self):
+        properties = {
+            "title": "person",
+            "$ref": "#/$defs/person",
+            "$defs": {
+                "person": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "age": {"type": "integer"},
+                    },
+                }
+            },
+            "examples": [
+                {"name": "John", "age": 30},
+                {"name": "Jane", "age": 25},
+            ],
+        }
+
+        _, type_validator = RefTypeParser().from_properties(
+            "person",
+            properties,
+            context=properties,
+            ref_cache={},
+            required=True,
+        )
+
+        self.assertEqual(
+            type_validator.get("examples"),
+            [
+                {"name": "John", "age": 30},
+                {"name": "Jane", "age": 25},
+            ],
+        )
