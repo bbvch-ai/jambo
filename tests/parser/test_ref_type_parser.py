@@ -2,8 +2,8 @@ from jambo.exceptions import InternalAssertionException, InvalidSchemaException
 from jambo.parser import ObjectTypeParser, RefTypeParser
 
 from pydantic import ValidationError
+from typing_extensions import ForwardRef
 
-from typing import ForwardRef
 from unittest import TestCase
 
 
