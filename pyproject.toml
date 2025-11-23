@@ -47,11 +47,6 @@ dev = [
 homepage = "https://github.com/HideyoshiNakazone/jambo"
 repository = "https://github.com/HideyoshiNakazone/jambo.git"
 
-[project.optional-dependencies]
-str-fmt = [
-    "isodate>=0.7.2",
-]
-
 
 # POE Tasks
 [tool.poe.tasks]
