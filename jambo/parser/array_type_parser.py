@@ -2,20 +2,27 @@ from jambo.exceptions import InvalidSchemaException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from typing_extensions import Iterable, TypeVar, Unpack
+from typing_extensions import (
+    Callable,
+    Generic,
+    Iterable,
+    Optional,
+    TypeVar,
+    Union,
+    Unpack,
+)
 
 import copy
 
 
 V = TypeVar("V")
+T = TypeVar("T", bound=list)
 
 
-class ArrayTypeParser(GenericTypeParser):
+class ArrayTypeParser(GenericTypeParser, Generic[T, V]):
     mapped_type = list
 
     json_schema_type = "type:array"
-
-    default_mappings = {"description": "description"}
 
     type_mappings = {
         "maxItems": "max_length",
@@ -43,14 +50,25 @@ class ArrayTypeParser(GenericTypeParser):
 
         mapped_properties = self.mappings_properties_builder(properties, **kwargs)
 
-        if "default" in properties or not kwargs.get("required", False):
+        if (
+            default_value := mapped_properties.pop("default", None)
+        ) is not None or not kwargs.get("required", False):
             mapped_properties["default_factory"] = self._build_default_factory(
-                properties.get("default"), wrapper_type
+                default_value, wrapper_type
             )
+
+        if (
+            example_values := mapped_properties.pop("example_values", None)
+        ) is not None:
+            mapped_properties["examples"] = [
+                wrapper_type(example) for example in example_values
+            ]
 
         return field_type, mapped_properties
 
-    def _build_default_factory(self, default_list, wrapper_type):
+    def _build_default_factory(
+        self, default_list: Optional[Iterable[V]], wrapper_type: type[V]
+    ) -> Callable[[], Union[V, None]]:
         if default_list is None:
             return lambda: None
 

@@ -109,3 +109,19 @@ class TestArrayTypeParser(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             parser.from_properties("placeholder", properties)
+
+    def test_array_parser_with_examples(self):
+        parser = ArrayTypeParser()
+
+        properties = {
+            "items": {"type": "integer"},
+            "examples": [
+                [1, 2, 3],
+                [4, 5, 6],
+            ],
+        }
+
+        type_parsing, type_validator = parser.from_properties("placeholder", properties)
+
+        self.assertEqual(type_parsing.__origin__, list)
+        self.assertEqual(type_validator["examples"], [[1, 2, 3], [4, 5, 6]])

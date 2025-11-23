@@ -23,12 +23,12 @@ class ObjectTypeParser(GenericTypeParser):
         )
         type_properties = self.mappings_properties_builder(properties, **kwargs)
 
-        if (default_value := type_properties.get("default")) is not None:
+        if (default_value := type_properties.pop("default", None)) is not None:
             type_properties["default_factory"] = lambda: type_parsing.model_validate(
                 default_value
             )
 
-        if (example_values := type_properties.get("examples")) is not None:
+        if (example_values := type_properties.pop("examples", None)) is not None:
             type_properties["examples"] = [
                 type_parsing.model_validate(example) for example in example_values
             ]
