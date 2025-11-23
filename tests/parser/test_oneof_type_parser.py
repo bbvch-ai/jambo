@@ -532,3 +532,71 @@ class TestOneOfTypeParser(TestCase):
         # Invalid: Wrong properties for the type
         with self.assertRaises(ValidationError):
             Model(shape={"type": "circle", "width": 10})
+
+    def test_oneof_with_examples(self):
+        schema = {
+            "title": "ExampleTest",
+            "type": "object",
+            "properties": {
+                "value": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "examples": ["example1", "example2"],
+                        },
+                        {
+                            "type": "integer",
+                            "examples": [1, 2, 3],
+                        },
+                    ]
+                }
+            },
+            "required": ["value"],
+        }
+
+        Model = SchemaConverter.build(schema)
+
+        # Since Pydantic does not natively support oneOf and the validation
+        # is done via a custom validator, the `value` is represented using `anyOf`
+        model_schema = Model.model_json_schema()
+
+        self.assertEqual(
+            model_schema["properties"]["value"]["anyOf"][0]["examples"],
+            ["example1", "example2"],
+        )
+
+        self.assertEqual(
+            model_schema["properties"]["value"]["anyOf"][1]["examples"],
+            [1, 2, 3],
+        )
+
+    def test_oneof_with_root_examples(self):
+        schema = {
+            "title": "ExampleTest",
+            "type": "object",
+            "properties": {
+                "value": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                        },
+                        {
+                            "type": "integer",
+                        },
+                    ],
+                    "examples": ["example1", 2],
+                }
+            },
+            "required": ["value"],
+        }
+
+        Model = SchemaConverter.build(schema)
+
+        # Since Pydantic does not natively support oneOf and the validation
+        # is done via a custom validator, the `value` is represented using `anyOf`
+        model_schema = Model.model_json_schema()
+
+        self.assertEqual(
+            model_schema["properties"]["value"]["examples"],
+            ["example1", 2],
+        )

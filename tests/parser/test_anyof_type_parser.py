@@ -99,7 +99,33 @@ class TestAnyOfTypeParser(TestCase):
         with self.assertRaises(InvalidSchemaException):
             AnyOfTypeParser().from_properties("placeholder", properties)
 
-    def test_any_of_with_examples(self):
+    def test_anyof_with_examples(self):
+        """
+        Tests the AnyOfTypeParser with a string or int type and examples.
+        """
+
+        properties = {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "examples": ["example string"],
+                },
+                {
+                    "type": "integer",
+                    "examples": [123],
+                },
+            ],
+        }
+
+        parsed_type, _ = AnyOfTypeParser().from_properties("placeholder", properties)
+
+        type_1, type_2 = get_args(parsed_type)
+
+        self.assertEqual(get_args(type_1)[1].examples, ["example string"])
+
+        self.assertEqual(get_args(type_2)[1].examples, [123])
+
+    def test_any_of_with_root_examples(self):
         """
         Tests the AnyOfTypeParser with a string or int type and examples.
         """
