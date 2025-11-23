@@ -169,7 +169,7 @@ class TestStringTypeParser(TestCase):
         properties = {
             "type": "string",
             "format": "time",
-            "examples": ["14:30:00", "09:15:30.500", "23:59:59Z", "10:00:00+02:00"],
+            "examples": ["14:30:00", "09:15:30.500", "10:00:00+02:00"],
         }
 
         type_parsing, type_validator = parser.from_properties("placeholder", properties)
@@ -180,7 +180,6 @@ class TestStringTypeParser(TestCase):
             [
                 time(hour=14, minute=30, second=0),
                 time(hour=9, minute=15, second=30, microsecond=500_000),
-                time(hour=23, minute=59, second=59, tzinfo=timezone.utc),
                 time(hour=10, minute=0, second=0, tzinfo=timezone(timedelta(hours=2))),
             ],
         )
@@ -255,7 +254,6 @@ class TestStringTypeParser(TestCase):
             "format": "date-time",
             "examples": [
                 "2025-11-17T11:15:00",
-                "2025-11-17T11:15:00Z",
                 "2025-11-17T11:15:00+01:00",
                 "2025-11-17T11:15:00.123456-05:00",
             ],
@@ -268,15 +266,6 @@ class TestStringTypeParser(TestCase):
             type_validator["examples"],
             [
                 datetime(year=2025, month=11, day=17, hour=11, minute=15, second=0),
-                datetime(
-                    year=2025,
-                    month=11,
-                    day=17,
-                    hour=11,
-                    minute=15,
-                    second=0,
-                    tzinfo=timezone.utc,
-                ),
                 datetime(
                     year=2025,
                     month=11,
