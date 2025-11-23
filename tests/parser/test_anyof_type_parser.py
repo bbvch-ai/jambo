@@ -98,3 +98,20 @@ class TestAnyOfTypeParser(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             AnyOfTypeParser().from_properties("placeholder", properties)
+
+    def test_any_of_with_examples(self):
+        """
+        Tests the AnyOfTypeParser with a string or int type and examples.
+        """
+
+        properties = {
+            "anyOf": [
+                {"type": "string"},
+                {"type": "integer"},
+            ],
+            "examples": ["100", 100],
+        }
+
+        _, type_validator = AnyOfTypeParser().from_properties("placeholder", properties)
+
+        self.assertEqual(type_validator["examples"], ["100", 100])

@@ -27,6 +27,9 @@ class AllOfTypeParser(GenericTypeParser):
             sub_properties
         )
 
+        if (examples := properties.get("examples")) is not None:
+            combined_properties["examples"] = examples
+
         return parser().from_properties_impl(name, combined_properties, **kwargs)
 
     @staticmethod
