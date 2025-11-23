@@ -22,6 +22,30 @@ class TestObjectTypeParser(TestCase):
         self.assertEqual(obj.name, "name")
         self.assertEqual(obj.age, 10)
 
+    def test_object_type_parser_with_object_example(self):
+        parser = ObjectTypeParser()
+
+        properties = {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+            },
+            "examples": [
+                {
+                    "name": "example_name",
+                    "age": 30,
+                }
+            ],
+        }
+
+        _, type_validator = parser.from_properties_impl("placeholder", properties)
+
+        test_example = type_validator["examples"][0]
+
+        self.assertEqual(test_example.name, "example_name")
+        self.assertEqual(test_example.age, 30)
+
     def test_object_type_parser_with_default(self):
         parser = ObjectTypeParser()
 

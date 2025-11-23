@@ -309,3 +309,50 @@ class TestAllOfTypeParser(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             AllOfTypeParser().from_properties("placeholder", properties)
+
+    def test_all_of_with_root_examples(self):
+        """
+        Tests the AllOfTypeParser with examples.
+        """
+
+        properties = {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "minLength": 1,
+                        }
+                    },
+                },
+                {
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "maxLength": 4,
+                        }
+                    },
+                },
+            ],
+            "examples": [
+                {"name": "John"},
+                {"name": "Jane"},
+                {"name": "Doe"},
+                {"name": "Jack"},
+            ],
+        }
+
+        type_parsed, type_properties = AllOfTypeParser().from_properties(
+            "placeholder", properties
+        )
+
+        self.assertEqual(
+            type_properties["examples"],
+            [
+                type_parsed(name="John"),
+                type_parsed(name="Jane"),
+                type_parsed(name="Doe"),
+                type_parsed(name="Jack"),
+            ],
+        )

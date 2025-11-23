@@ -20,3 +20,14 @@ class TestGenericTypeParser(TestCase):
     def test_get_impl_invalid_type(self):
         with self.assertRaises(InvalidSchemaException):
             GenericTypeParser._get_impl({"type": "invalid_type"})
+
+    def test_invalid_examples_not_list(self):
+        parser = StringTypeParser()
+
+        properties = {
+            "type": "integer",
+            "examples": "this should be a list",
+        }
+
+        with self.assertRaises(InvalidSchemaException):
+            parser.from_properties("placeholder", properties)

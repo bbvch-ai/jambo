@@ -41,4 +41,9 @@ class EnumTypeParser(GenericTypeParser):
         if "default" in parsed_properties and parsed_properties["default"] is not None:
             parsed_properties["default"] = enum_type(parsed_properties["default"])
 
+        if "examples" in parsed_properties:
+            parsed_properties["examples"] = [
+                enum_type(example) for example in parsed_properties["examples"]
+            ]
+
         return enum_type, parsed_properties

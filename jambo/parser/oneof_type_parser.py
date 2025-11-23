@@ -45,8 +45,7 @@ class OneOfTypeParser(GenericTypeParser):
         # they were added by OpenAPI and not all implementations may support them,
         # and they do not always generate a model one-to-one to the Pydantic model
         # TL;DR: Discriminators were added by OpenAPI and not a Official JSON Schema feature
-        discriminator = properties.get("discriminator")
-        if discriminator is not None:
+        if (discriminator := properties.get("discriminator")) is not None:
             validated_type = self._build_type_one_of_with_discriminator(
                 subfield_types, discriminator
             )

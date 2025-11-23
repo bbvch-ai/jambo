@@ -18,6 +18,7 @@ class GenericTypeParser(ABC, Generic[T]):
     default_mappings = {
         "default": "default",
         "description": "description",
+        "examples": "examples",
     }
 
     @abstractmethod
@@ -49,6 +50,11 @@ class GenericTypeParser(ABC, Generic[T]):
         if not self._validate_default(parsed_type, parsed_properties):
             raise InvalidSchemaException(
                 "Default value is not valid", invalid_field=name
+            )
+
+        if not self._validate_examples(parsed_type, parsed_properties):
+            raise InvalidSchemaException(
+                "Examples values are not valid", invalid_field=name
             )
 
         return parsed_type, parsed_properties
@@ -120,6 +126,25 @@ class GenericTypeParser(ABC, Generic[T]):
         if value is None:
             return True
 
+        return GenericTypeParser._is_valid_value(field_type, field_prop, value)
+
+    @staticmethod
+    def _validate_examples(field_type: T, field_prop: dict) -> bool:
+        examples = field_prop.get("examples")
+
+        if examples is None:
+            return True
+
+        if not isinstance(examples, list):
+            return False
+
+        return all(
+            GenericTypeParser._is_valid_value(field_type, field_prop, e)
+            for e in examples
+        )
+
+    @staticmethod
+    def _is_valid_value(field_type: T, field_prop: dict, value: Any) -> bool:
         try:
             field = Annotated[field_type, Field(**field_prop)]  # type: ignore
             TypeAdapter(field).validate_python(value)

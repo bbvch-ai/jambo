@@ -23,6 +23,7 @@ class TestFloatTypeParser(TestCase):
             "maximum": 10.5,
             "minimum": 1.0,
             "multipleOf": 0.5,
+            "examples": [1.5, 2.5],
         }
 
         type_parsing, type_validator = parser.from_properties("placeholder", properties)
@@ -31,6 +32,7 @@ class TestFloatTypeParser(TestCase):
         self.assertEqual(type_validator["le"], 10.5)
         self.assertEqual(type_validator["ge"], 1.0)
         self.assertEqual(type_validator["multiple_of"], 0.5)
+        self.assertEqual(type_validator["examples"], [1.5, 2.5])
 
     def test_float_parser_with_default(self):
         parser = FloatTypeParser()

@@ -42,3 +42,19 @@ class TestBoolTypeParser(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             parser.from_properties_impl("placeholder", properties)
+
+    def test_bool_parser_with_examples(self):
+        parser = BooleanTypeParser()
+
+        properties = {
+            "type": "boolean",
+            "examples": [True, False],
+        }
+
+        type_parsing, type_validator = parser.from_properties_impl(
+            "placeholder", properties
+        )
+
+        self.assertEqual(type_parsing, bool)
+        self.assertEqual(type_validator["default"], None)
+        self.assertEqual(type_validator["examples"], [True, False])
