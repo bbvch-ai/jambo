@@ -15,6 +15,13 @@ def is_pydantic_model(cls):
 
 
 class TestSchemaConverter(TestCase):
+    def setUp(self):
+        self.ref_cache = {}
+        self.converter = SchemaConverter(ref_cache=self.ref_cache)
+
+    def tearDown(self):
+        self.converter.clear_ref_cache()
+
     def test_invalid_schema(self):
         schema = {
             "title": 1,
@@ -27,7 +34,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
 
     def test_invalid_schema_type(self):
         schema = {
@@ -41,7 +48,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
 
     def test_build_expects_title(self):
         schema = {
@@ -54,7 +61,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
 
     def test_build_expects_object(self):
         schema = {
@@ -64,7 +71,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(UnsupportedSchemaException):
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
 
     def test_is_invalid_field(self):
         schema = {
@@ -80,7 +87,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException) as context:
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
             self.assertTrue("Unknown type" in str(context.exception))
 
     def test_jsonschema_to_pydantic(self):
@@ -95,7 +102,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertTrue(is_pydantic_model(model))
 
@@ -116,7 +123,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(model(name="John", age=30).name, "John")
 
@@ -147,7 +154,7 @@ class TestSchemaConverter(TestCase):
             "required": ["age"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(model(age=30).age, 30)
 
@@ -172,7 +179,7 @@ class TestSchemaConverter(TestCase):
             "required": ["age"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(model(age=30).age, 30.0)
 
@@ -193,7 +200,7 @@ class TestSchemaConverter(TestCase):
             "required": ["is_active"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(model(is_active=True).is_active, True)
 
@@ -216,7 +223,7 @@ class TestSchemaConverter(TestCase):
             "required": ["friends"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(
             model(friends=["John", "Jane", "John"]).friends, {"John", "Jane"}
@@ -229,26 +236,7 @@ class TestSchemaConverter(TestCase):
             model(friends=["John", "Jane", "Invalid"])
 
     def test_validation_list_with_missing_items(self):
-        model = SchemaConverter.build(
-            {
-                "title": "Person",
-                "description": "A person",
-                "type": "object",
-                "properties": {
-                    "friends": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "minItems": 1,
-                        "maxItems": 2,
-                        "default": ["John", "Jane"],
-                    },
-                },
-            }
-        )
-
-        self.assertEqual(model().friends, ["John", "Jane"])
-
-        model = SchemaConverter.build(
+        model = self.converter.build_with_instance(
             {
                 "title": "Person",
                 "description": "A person",
@@ -286,7 +274,7 @@ class TestSchemaConverter(TestCase):
             "required": ["address"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         obj = model(address={"street": "123 Main St", "city": "Springfield"})
 
@@ -310,7 +298,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         obj = model(name="John")
 
@@ -333,7 +321,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            SchemaConverter.build(schema_max_length)
+            self.converter.build_with_instance(schema_max_length)
 
     def test_default_for_list(self):
         schema_list = {
@@ -350,10 +338,11 @@ class TestSchemaConverter(TestCase):
             "required": ["friends"],
         }
 
-        model_list = SchemaConverter.build(schema_list)
+        model_list = self.converter.build_with_instance(schema_list)
 
         self.assertEqual(model_list().friends, ["John", "Jane"])
 
+    def test_default_for_list_with_unique_items(self):
         # Test for default with uniqueItems
         schema_set = {
             "title": "Person",
@@ -370,7 +359,7 @@ class TestSchemaConverter(TestCase):
             "required": ["friends"],
         }
 
-        model_set = SchemaConverter.build(schema_set)
+        model_set = self.converter.build_with_instance(schema_set)
 
         self.assertEqual(model_set().friends, {"John", "Jane"})
 
@@ -392,7 +381,7 @@ class TestSchemaConverter(TestCase):
             "required": ["address"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         obj = model(address={"street": "123 Main St", "city": "Springfield"})
 
@@ -416,7 +405,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model(
             name="J",
@@ -445,7 +434,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model(id=1)
         self.assertEqual(obj.id, 1)
@@ -469,7 +458,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"email": {"type": "string", "format": "email"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(model(email="test@example.com").email, "test@example.com")
 
         with self.assertRaises(ValidationError):
@@ -482,7 +471,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"website": {"type": "string", "format": "uri"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(
             model(website="https://example.com").website, AnyUrl("https://example.com")
         )
@@ -497,7 +486,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"ip": {"type": "string", "format": "ipv4"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(model(ip="192.168.1.1").ip, IPv4Address("192.168.1.1"))
 
         with self.assertRaises(ValidationError):
@@ -510,7 +499,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"ip": {"type": "string", "format": "ipv6"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(
             model(ip="2001:0db8:85a3:0000:0000:8a2e:0370:7334").ip,
             IPv6Address("2001:0db8:85a3:0000:0000:8a2e:0370:7334"),
@@ -526,7 +515,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"id": {"type": "string", "format": "uuid"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         self.assertEqual(
             model(id="123e4567-e89b-12d3-a456-426614174000").id,
@@ -543,7 +532,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"hostname": {"type": "string", "format": "hostname"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(model(hostname="example.com").hostname, "example.com")
 
         with self.assertRaises(ValidationError):
@@ -556,7 +545,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"timestamp": {"type": "string", "format": "date-time"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(
             model(timestamp="2024-01-01T12:00:00Z").timestamp.isoformat(),
             "2024-01-01T12:00:00+00:00",
@@ -572,7 +561,7 @@ class TestSchemaConverter(TestCase):
             "properties": {"time": {"type": "string", "format": "time"}},
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
         self.assertEqual(
             model(time="20:20:39+00:00").time.isoformat(), "20:20:39+00:00"
         )
@@ -588,7 +577,7 @@ class TestSchemaConverter(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            SchemaConverter.build(schema)
+            self.converter.build_with_instance(schema)
 
     def test_ref_with_root_ref(self):
         schema = {
@@ -604,7 +593,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name", "age"],
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         obj = model(
             name="John",
@@ -639,7 +628,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        model = SchemaConverter.build(schema)
+        model = self.converter.build_with_instance(schema)
 
         obj = model(
             name="John",
@@ -678,7 +667,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model(
             name="John",
@@ -704,7 +693,7 @@ class TestSchemaConverter(TestCase):
             "required": ["status"],
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model(status="active")
         self.assertEqual(obj.status.value, "active")
@@ -723,7 +712,7 @@ class TestSchemaConverter(TestCase):
             "required": ["status"],
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model()
         self.assertEqual(obj.status.value, "active")
@@ -740,7 +729,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name"],
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model()
         self.assertEqual(obj.name, "United States of America")
@@ -763,7 +752,7 @@ class TestSchemaConverter(TestCase):
             "required": ["name"],
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model()
         self.assertEqual(obj.name, ["Brazil"])
@@ -783,7 +772,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        Model = SchemaConverter.build(schema)
+        Model = self.converter.build_with_instance(schema)
 
         obj = Model()
         self.assertIsNone(obj.a_thing)
@@ -825,7 +814,7 @@ class TestSchemaConverter(TestCase):
             },
         }
 
-        schema_type = SchemaConverter.build(schema)
+        schema_type = self.converter.build_with_instance(schema)
 
         # check for me that the types generated by the oneOf in the typing.Annotated have different names
         operating_system_field = schema_type.model_fields["operating_system"]
@@ -839,7 +828,7 @@ class TestSchemaConverter(TestCase):
 
     def test_object_invalid_require(self):
         # https://github.com/HideyoshiNakazone/jambo/issues/60
-        object_ = SchemaConverter.build(
+        object_ = self.converter.build_with_instance(
             {
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
                 "title": "TEST",
