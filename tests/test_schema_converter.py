@@ -880,3 +880,23 @@ class TestSchemaConverter(TestCase):
 
         self.assertIs(converter1._ref_cache, converter2._ref_cache)
         self.assertIs(model1, model2)
+
+    def test_get_type_from_cache(self):
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model = self.converter.build_with_instance(schema)
+
+        cached_model = self.converter.get_cached_ref("Person")
+
+        self.assertIs(model, cached_model)
