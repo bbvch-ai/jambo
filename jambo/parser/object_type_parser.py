@@ -1,3 +1,4 @@
+from jambo.exceptions import InternalAssertionException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.json_schema_type import JSONSchema
 from jambo.types.type_parser_options import TypeParserOptions
@@ -5,6 +6,8 @@ from jambo.types.type_parser_options import TypeParserOptions
 from pydantic import BaseModel, ConfigDict, Field, create_model
 from pydantic.fields import FieldInfo
 from typing_extensions import Unpack
+
+import warnings
 
 
 class ObjectTypeParser(GenericTypeParser):
@@ -15,6 +18,12 @@ class ObjectTypeParser(GenericTypeParser):
     def from_properties_impl(
         self, name: str, properties: JSONSchema, **kwargs: Unpack[TypeParserOptions]
     ) -> tuple[type[BaseModel], dict]:
+        ref_cache = kwargs.get("ref_cache")
+        if ref_cache is None:
+            raise InternalAssertionException(
+                "`ref_cache` must be provided in kwargs for RefTypeParser"
+            )
+
         type_parsing = self.to_model(
             name,
             properties.get("properties", {}),
@@ -36,6 +45,13 @@ class ObjectTypeParser(GenericTypeParser):
             type_properties["examples"] = [
                 type_parsing.model_validate(example) for example in example_values
             ]
+
+        if name in ref_cache:
+            warnings.warn(
+                f"Type '{name}' is already in the ref_cache and will be overwritten.",
+                UserWarning,
+            )
+        ref_cache[name] = type_parsing
 
         return type_parsing, type_properties
 
