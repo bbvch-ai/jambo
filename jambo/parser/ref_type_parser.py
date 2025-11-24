@@ -1,5 +1,6 @@
 from jambo.exceptions import InternalAssertionException, InvalidSchemaException
 from jambo.parser import GenericTypeParser
+from jambo.types import RefCacheDict
 from jambo.types.json_schema_type import JSONSchema
 from jambo.types.type_parser_options import TypeParserOptions
 
@@ -72,7 +73,7 @@ class RefTypeParser(GenericTypeParser):
         return mapped_type
 
     def _get_ref_from_cache(
-        self, ref_name: str, ref_cache: dict[str, ForwardRef | type | None]
+        self, ref_name: str, ref_cache: RefCacheDict
     ) -> RefType | type | None:
         try:
             ref_state = ref_cache[ref_name]

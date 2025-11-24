@@ -1,9 +1,12 @@
 from jambo.types.json_schema_type import JSONSchema
 
-from typing_extensions import ForwardRef, TypedDict
+from typing_extensions import ForwardRef, MutableMapping, TypedDict
+
+
+RefCacheDict = MutableMapping[str, ForwardRef | type | None]
 
 
 class TypeParserOptions(TypedDict):
     required: bool
     context: JSONSchema
-    ref_cache: dict[str, ForwardRef | type | None]
+    ref_cache: RefCacheDict

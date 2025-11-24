@@ -1,10 +1,11 @@
 from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
 from jambo.parser import ObjectTypeParser, RefTypeParser
-from jambo.types import JSONSchema
+from jambo.types import JSONSchema, RefCacheDict
 
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import validator_for
 from pydantic import BaseModel
+from typing_extensions import Optional
 
 
 class SchemaConverter:
@@ -16,13 +17,44 @@ class SchemaConverter:
     fields and types. The generated model can be used for data validation and serialization.
     """
 
-    @staticmethod
-    def build(schema: JSONSchema) -> type[BaseModel]:
+    def __init__(self, ref_cache: Optional[RefCacheDict] = None) -> None:
+        if ref_cache is None:
+            ref_cache = dict()
+        self._ref_cache = ref_cache
+
+    def build_with_instance(
+        self,
+        schema: JSONSchema,
+        ref_cache: Optional[RefCacheDict] = None,
+        with_clean_cache: bool = True,
+    ) -> type[BaseModel]:
         """
         Converts a JSON Schema to a Pydantic model.
-        :param schema: The JSON Schema to convert.
-        :return: A Pydantic model class.
+            :param schema: The JSON Schema to convert.
+            :param ref_cache: An optional reference cache to use during conversion, if provided `with_clean_cache` will be ignored.
+            :param with_clean_cache: Whether to use a clean reference cache for this conversion. Set to True due to API compatibility. Will be set to False in future versions.
+            :return: The generated Pydantic model.
         """
+        if ref_cache is None:
+            ref_cache = self._ref_cache
+
+        return self.build(schema, ref_cache, with_clean_cache)
+
+    @staticmethod
+    def build(
+        schema: JSONSchema,
+        ref_cache: Optional[RefCacheDict] = None,
+        with_clean_cache: bool = True,
+    ) -> type[BaseModel]:
+        """
+        Converts a JSON Schema to a Pydantic model.
+            :param schema: The JSON Schema to convert.
+            :param ref_cache: An optional reference cache to use during conversion, if provided `with_clean_cache` will be ignored.
+            :param with_clean_cache: Whether to use a clean reference cache for this conversion. Set to rue due to API compatibility. Will be set to False in future versions.
+            :return: The generated Pydantic model.
+        """
+        if ref_cache is None or with_clean_cache:
+            ref_cache = dict()
 
         try:
             validator = validator_for(schema)
@@ -46,7 +78,7 @@ class SchemaConverter:
                     schema.get("properties", {}),
                     schema.get("required", []),
                     context=schema,
-                    ref_cache=dict(),
+                    ref_cache=ref_cache,
                     required=True,
                 )
 
@@ -55,7 +87,7 @@ class SchemaConverter:
                     schema["title"],
                     schema,
                     context=schema,
-                    ref_cache=dict(),
+                    ref_cache=ref_cache,
                     required=True,
                 )
                 return parsed_model
@@ -67,6 +99,25 @@ class SchemaConverter:
                     "Only object and $ref schema types are supported.",
                     unsupported_field=unsupported_type,
                 )
+
+    def clear_ref_cache(self) -> None:
+        """
+        Clears the reference cache.
+        """
+        self._ref_cache.clear()
+
+    def get_cached_ref(self, ref_name: str):
+        """
+        Gets a cached reference from the reference cache.
+        :param ref_name: The name of the reference to get.
+        :return: The cached reference, or None if not found.
+        """
+        cached_type = self._ref_cache.get(ref_name)
+
+        if isinstance(cached_type, type):
+            return cached_type
+
+        return None
 
     @staticmethod
     def _get_schema_type(schema: JSONSchema) -> str | None:
