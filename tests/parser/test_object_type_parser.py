@@ -1,9 +1,24 @@
+from jambo.exceptions import InternalAssertionException
 from jambo.parser import ObjectTypeParser
 
 from unittest import TestCase
 
 
 class TestObjectTypeParser(TestCase):
+    def test_object_type_parser_throws_without_ref_cache(self):
+        parser = ObjectTypeParser()
+
+        properties = {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+            },
+        }
+
+        with self.assertRaises(InternalAssertionException):
+            parser.from_properties_impl("placeholder", properties)
+
     def test_object_type_parser(self):
         parser = ObjectTypeParser()
 
