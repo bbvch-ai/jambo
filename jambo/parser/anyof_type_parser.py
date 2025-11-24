@@ -30,8 +30,10 @@ class AnyOfTypeParser(GenericTypeParser):
         sub_properties = properties["anyOf"]
 
         sub_types = [
-            GenericTypeParser.type_from_properties(name, subProperty, **kwargs)
-            for subProperty in sub_properties
+            GenericTypeParser.type_from_properties(
+                f"{name}_sub{i}", subProperty, **kwargs
+            )
+            for i, subProperty in enumerate(sub_properties)
         ]
 
         if not kwargs.get("required", False):
