@@ -26,25 +26,18 @@ class SchemaConverter:
         self,
         schema: JSONSchema,
         ref_cache: Optional[RefCacheDict] = None,
-        with_clean_cache: bool = True,
     ) -> type[BaseModel]:
         """
         Converts a JSON Schema to a Pydantic model.
             :param schema: The JSON Schema to convert.
-            :param ref_cache: An optional reference cache to use during conversion, if provided `with_clean_cache` will be ignored.
-            :param with_clean_cache: Whether to use a clean reference cache for this conversion. Set to True due to API compatibility. Will be set to False in future versions.
+            :param ref_cache: An optional reference cache to use during conversion.
             :return: The generated Pydantic model.
         """
-        if ref_cache is None:
-            ref_cache = self._ref_cache
-
-        return self.build(schema, ref_cache, with_clean_cache)
+        return self.build(schema, ref_cache or self._ref_cache)
 
     @staticmethod
     def build(
-        schema: JSONSchema,
-        ref_cache: Optional[RefCacheDict] = None,
-        with_clean_cache: bool = True,
+        schema: JSONSchema, ref_cache: Optional[RefCacheDict] = None
     ) -> type[BaseModel]:
         """
         Converts a JSON Schema to a Pydantic model.
@@ -53,7 +46,7 @@ class SchemaConverter:
             :param with_clean_cache: Whether to use a clean reference cache for this conversion. Set to rue due to API compatibility. Will be set to False in future versions.
             :return: The generated Pydantic model.
         """
-        if ref_cache is None or with_clean_cache:
+        if ref_cache is None:
             ref_cache = dict()
 
         try:
