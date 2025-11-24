@@ -866,3 +866,28 @@ class TestSchemaConverter(TestCase):
         )
 
         self.assertFalse(object_.model_fields["description"].is_required())  # FAIL
+
+    def test_instance_level_ref_cache(self):
+        ref_cache = {}
+
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        converter1 = SchemaConverter(ref_cache)
+        model1 = converter1.build_with_instance(schema)
+
+        converter2 = SchemaConverter(ref_cache)
+        model2 = converter2.build_with_instance(schema)
+
+        self.assertIs(converter1._ref_cache, converter2._ref_cache)
+        self.assertIs(model1, model2)

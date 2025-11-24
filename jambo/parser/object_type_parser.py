@@ -18,12 +18,6 @@ class ObjectTypeParser(GenericTypeParser):
     def from_properties_impl(
         self, name: str, properties: JSONSchema, **kwargs: Unpack[TypeParserOptions]
     ) -> tuple[type[BaseModel], dict]:
-        ref_cache = kwargs.get("ref_cache")
-        if ref_cache is None:
-            raise InternalAssertionException(
-                "`ref_cache` must be provided in kwargs for RefTypeParser"
-            )
-
         type_parsing = self.to_model(
             name,
             properties.get("properties", {}),
@@ -46,14 +40,6 @@ class ObjectTypeParser(GenericTypeParser):
                 type_parsing.model_validate(example) for example in example_values
             ]
 
-        if name in ref_cache and isinstance(ref_cache[name], type):
-            warnings.warn(
-                f"Type '{name}' is already in the ref_cache and will be overwritten."
-                " This may indicate a circular reference in the schema or a collision in the schema.",
-                UserWarning,
-            )
-        ref_cache[name] = type_parsing
-
         return type_parsing, type_properties
 
     @classmethod
@@ -71,10 +57,29 @@ class ObjectTypeParser(GenericTypeParser):
         :param required_keys: List of required keys in the schema.
         :return: A Pydantic model class.
         """
+        ref_cache = kwargs.get("ref_cache")
+        if ref_cache is None:
+            raise InternalAssertionException(
+                "`ref_cache` must be provided in kwargs for ObjectTypeParser"
+            )
+
+        if (model := ref_cache.get(name)) is not None and isinstance(model, type):
+            return model
+
         model_config = ConfigDict(validate_assignment=True)
         fields = cls._parse_properties(properties, required_keys, **kwargs)
 
-        return create_model(name, __config__=model_config, **fields)  # type: ignore
+        model = create_model(name, __config__=model_config, **fields)  # type: ignore
+
+        if name in ref_cache and isinstance(ref_cache[name], type):
+            warnings.warn(
+                f"Type '{name}' is already in the ref_cache and will be overwritten."
+                " This may indicate a circular reference in the schema or a collision in the schema.",
+                UserWarning,
+            )
+        ref_cache[name] = model
+
+        return model
 
     @classmethod
     def _parse_properties(
