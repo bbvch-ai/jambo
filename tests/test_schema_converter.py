@@ -937,3 +937,8 @@ class TestSchemaConverter(TestCase):
         cached_model = self.converter.get_cached_ref("Person")
 
         self.assertIs(model, cached_model)
+
+    def test_get_type_from_cache_not_found(self):
+        cached_model = self.converter.get_cached_ref("NonExistentModel")
+
+        self.assertIsNone(cached_model)
