@@ -29,11 +29,11 @@ class OneOfTypeParser(GenericTypeParser):
 
         mapped_properties = self.mappings_properties_builder(properties, **kwargs)
 
-        sub_properties = properties["oneOf"]
-
         sub_types = [
-            GenericTypeParser.type_from_properties(name, subProperty, **kwargs)
-            for subProperty in sub_properties
+            GenericTypeParser.type_from_properties(
+                f"{name}_sub{i}", subProperty, **kwargs
+            )
+            for i, subProperty in enumerate(properties["oneOf"])
         ]
 
         if not kwargs.get("required", False):
