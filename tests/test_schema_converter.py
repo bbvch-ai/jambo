@@ -942,3 +942,59 @@ class TestSchemaConverter(TestCase):
         cached_model = self.converter.get_cached_ref("NonExistentModel")
 
         self.assertIsNone(cached_model)
+
+    def test_get_type_from_cache_nested_type(self):
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street": {"type": "string"},
+                        "city": {"type": "string"},
+                    },
+                    "required": ["street", "city"],
+                },
+            },
+            "required": ["name", "age", "address"],
+        }
+
+        model = self.converter.build_with_instance(schema)
+
+        cached_model = self.converter.get_cached_ref("Person.address")
+
+        self.assertIsNotNone(cached_model)
+        self.assertIs(model.model_fields["address"].annotation, cached_model)
+
+    def test_get_type_from_cache_with_def(self):
+        schema = {
+            "title": "person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {"$ref": "#/$defs/address"},
+            },
+            "$defs": {
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street": {"type": "string"},
+                        "city": {"type": "string"},
+                    },
+                    "required": ["street", "city"],
+                }
+            },
+        }
+
+        person_model = self.converter.build_with_instance(schema)
+        cached_person_model = self.converter.get_cached_ref("person")
+
+        self.assertIs(person_model, cached_person_model)
+
+        cached_address_model = self.converter.get_cached_ref("address")
+
+        self.assertIsNotNone(cached_address_model)

@@ -67,7 +67,7 @@ class ObjectTypeParser(GenericTypeParser):
             return model
 
         model_config = ConfigDict(validate_assignment=True)
-        fields = cls._parse_properties(properties, required_keys, **kwargs)
+        fields = cls._parse_properties(name, properties, required_keys, **kwargs)
 
         model = create_model(name, __config__=model_config, **fields)  # type: ignore
 
@@ -84,6 +84,7 @@ class ObjectTypeParser(GenericTypeParser):
     @classmethod
     def _parse_properties(
         cls,
+        name: str,
         properties: dict[str, JSONSchema],
         required_keys: list[str],
         **kwargs: Unpack[TypeParserOptions],
@@ -91,15 +92,15 @@ class ObjectTypeParser(GenericTypeParser):
         required_keys = required_keys or []
 
         fields = {}
-        for name, prop in properties.items():
+        for field_name, field_prop in properties.items():
             sub_property: TypeParserOptions = kwargs.copy()
-            sub_property["required"] = name in required_keys
+            sub_property["required"] = field_name in required_keys
 
             parsed_type, parsed_properties = GenericTypeParser.type_from_properties(
-                name,
-                prop,
+                f"{name}.{field_name}",
+                field_prop,
                 **sub_property,  # type: ignore
             )
-            fields[name] = (parsed_type, Field(**parsed_properties))
+            fields[field_name] = (parsed_type, Field(**parsed_properties))
 
         return fields
