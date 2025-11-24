@@ -1,5 +1,6 @@
 from jambo import SchemaConverter
 from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
+from jambo.types import JSONSchema
 
 from pydantic import AnyUrl, BaseModel, ValidationError
 
@@ -791,3 +792,49 @@ class TestSchemaConverter(TestCase):
 
         with self.assertRaises(ValidationError):
             Model(a_thing="not none")
+
+    def test_scoped_ref_schema(self):
+        schema: JSONSchema = {
+            "title": "Example Schema",
+            "type": "object",
+            "properties": {
+                "operating_system": {
+                    "oneOf": [
+                        {"$ref": "#/$defs/operating_system"},
+                        {
+                            "type": "object",
+                            "properties": {
+                                "creation": {"$ref": "#/$defs/operating_system"},
+                                "reinstallation": {"$ref": "#/$defs/operating_system"},
+                            },
+                            "required": ["creation", "reinstallation"],
+                        },
+                    ]
+                },
+            },
+            "$defs": {
+                "operating_system": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "version": {"type": "string"},
+                    },
+                    "required": ["name", "version"],
+                }
+            },
+        }
+
+        schema_type = SchemaConverter.build(schema)
+
+        _ = schema_type.model_validate(
+            {"operating_system": {"name": "Ubuntu", "version": "20.04"}}
+        )
+
+        _ = schema_type.model_validate(
+            {
+                "operating_system": {
+                    "creation": {"name": "Ubuntu", "version": "20.04"},
+                    "reinstallation": {"name": "Ubuntu", "version": "22.04"},
+                }
+            }
+        )
