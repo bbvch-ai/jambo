@@ -46,9 +46,10 @@ class ObjectTypeParser(GenericTypeParser):
                 type_parsing.model_validate(example) for example in example_values
             ]
 
-        if name in ref_cache:
+        if name in ref_cache and isinstance(ref_cache[name], type):
             warnings.warn(
-                f"Type '{name}' is already in the ref_cache and will be overwritten.",
+                f"Type '{name}' is already in the ref_cache and will be overwritten."
+                " This may indicate a circular reference in the schema or a collision in the schema.",
                 UserWarning,
             )
         ref_cache[name] = type_parsing
