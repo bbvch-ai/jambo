@@ -836,3 +836,33 @@ class TestSchemaConverter(TestCase):
         second_type = get_args(arg2)[0]
 
         self.assertNotEqual(first_type.__name__, second_type.__name__)
+
+    def test_object_invalid_require(self):
+        # https://github.com/HideyoshiNakazone/jambo/issues/60
+        object_ = SchemaConverter.build(
+            {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "TEST",
+                "type": "object",
+                "required": ["title"],
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "The title of the object",
+                    },
+                    "description": {
+                        "type": "object",
+                        "properties": {
+                            "summary": {
+                                "type": "string",
+                            },
+                            "details": {
+                                "type": "string",
+                            },
+                        },
+                    },
+                },
+            }
+        )
+
+        self.assertFalse(object_.model_fields["description"].is_required())  # FAIL
