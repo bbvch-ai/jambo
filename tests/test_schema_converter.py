@@ -16,8 +16,7 @@ def is_pydantic_model(cls):
 
 class TestSchemaConverter(TestCase):
     def setUp(self):
-        self.ref_cache = {}
-        self.converter = SchemaConverter(ref_cache=self.ref_cache)
+        self.converter = SchemaConverter()
 
     def tearDown(self):
         self.converter.clear_ref_cache()
@@ -880,6 +879,44 @@ class TestSchemaConverter(TestCase):
 
         self.assertIs(converter1._ref_cache, converter2._ref_cache)
         self.assertIs(model1, model2)
+
+    def test_instance_level_ref_cache_isolation_via_without_cache_param(self):
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model1 = self.converter.build_with_instance(schema, without_cache=True)
+        model2 = self.converter.build_with_instance(schema, without_cache=True)
+
+        self.assertIsNot(model1, model2)
+
+    def test_instance_level_ref_cache_isolation_via_provided_cache(self):
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model1 = self.converter.build_with_instance(schema, ref_cache={})
+        model2 = self.converter.build_with_instance(schema, ref_cache={})
+
+        self.assertIsNot(model1, model2)
 
     def test_get_type_from_cache(self):
         schema = {
