@@ -92,3 +92,18 @@ class TestObjectTypeParser(TestCase):
         # Chekc default factory new object id
         new_obj = type_validator["default_factory"]()
         self.assertNotEqual(id(default_obj), id(new_obj))
+
+    def test_object_type_parser_warns_if_object_override_in_cache(self):
+        ref_cache = {}
+
+        parser = ObjectTypeParser()
+
+        properties = {"type": "object", "properties": {}}
+
+        with self.assertWarns(UserWarning):
+            _, type_validator = parser.from_properties_impl(
+                "placeholder", properties, ref_cache=ref_cache
+            )
+            _, type_validator = parser.from_properties_impl(
+                "placeholder", properties, ref_cache=ref_cache
+            )

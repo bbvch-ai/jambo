@@ -64,19 +64,17 @@ class ObjectTypeParser(GenericTypeParser):
             )
 
         if (model := ref_cache.get(name)) is not None and isinstance(model, type):
+            warnings.warn(
+                f"Type '{name}' is already in the ref_cache and therefore cached value will be used."
+                " This may indicate a namming collision in the schema or just a normal optimization,"
+                " if this behavior is desired pass a clean ref_cache or use the param `without_cache`"
+            )
             return model
 
         model_config = ConfigDict(validate_assignment=True)
         fields = cls._parse_properties(name, properties, required_keys, **kwargs)
 
         model = create_model(name, __config__=model_config, **fields)  # type: ignore
-
-        if name in ref_cache and isinstance(ref_cache[name], type):
-            warnings.warn(
-                f"Type '{name}' is already in the ref_cache and will be overwritten."
-                " This may indicate a circular reference in the schema or a collision in the schema.",
-                UserWarning,
-            )
         ref_cache[name] = model
 
         return model
