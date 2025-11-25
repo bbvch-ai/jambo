@@ -1,3 +1,4 @@
+from jambo.exceptions import InternalAssertionException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.json_schema_type import JSONSchema
 from jambo.types.type_parser_options import TypeParserOptions
@@ -5,6 +6,8 @@ from jambo.types.type_parser_options import TypeParserOptions
 from pydantic import BaseModel, ConfigDict, Field, create_model
 from pydantic.fields import FieldInfo
 from typing_extensions import Unpack
+
+import warnings
 
 
 class ObjectTypeParser(GenericTypeParser):
@@ -54,14 +57,32 @@ class ObjectTypeParser(GenericTypeParser):
         :param required_keys: List of required keys in the schema.
         :return: A Pydantic model class.
         """
-        model_config = ConfigDict(validate_assignment=True)
-        fields = cls._parse_properties(properties, required_keys, **kwargs)
+        ref_cache = kwargs.get("ref_cache")
+        if ref_cache is None:
+            raise InternalAssertionException(
+                "`ref_cache` must be provided in kwargs for ObjectTypeParser"
+            )
 
-        return create_model(name, __config__=model_config, **fields)  # type: ignore
+        if (model := ref_cache.get(name)) is not None and isinstance(model, type):
+            warnings.warn(
+                f"Type '{name}' is already in the ref_cache and therefore cached value will be used."
+                " This may indicate a namming collision in the schema or just a normal optimization,"
+                " if this behavior is desired pass a clean ref_cache or use the param `without_cache`"
+            )
+            return model
+
+        model_config = ConfigDict(validate_assignment=True)
+        fields = cls._parse_properties(name, properties, required_keys, **kwargs)
+
+        model = create_model(name, __config__=model_config, **fields)  # type: ignore
+        ref_cache[name] = model
+
+        return model
 
     @classmethod
     def _parse_properties(
         cls,
+        name: str,
         properties: dict[str, JSONSchema],
         required_keys: list[str],
         **kwargs: Unpack[TypeParserOptions],
@@ -69,15 +90,15 @@ class ObjectTypeParser(GenericTypeParser):
         required_keys = required_keys or []
 
         fields = {}
-        for name, prop in properties.items():
+        for field_name, field_prop in properties.items():
             sub_property: TypeParserOptions = kwargs.copy()
-            sub_property["required"] = name in required_keys
+            sub_property["required"] = field_name in required_keys
 
             parsed_type, parsed_properties = GenericTypeParser.type_from_properties(
-                name,
-                prop,
+                f"{name}.{field_name}",
+                field_prop,
                 **sub_property,  # type: ignore
             )
-            fields[name] = (parsed_type, Field(**parsed_properties))
+            fields[field_name] = (parsed_type, Field(**parsed_properties))
 
         return fields

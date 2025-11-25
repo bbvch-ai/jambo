@@ -1,9 +1,24 @@
+from jambo.exceptions import InternalAssertionException
 from jambo.parser import ObjectTypeParser
 
 from unittest import TestCase
 
 
 class TestObjectTypeParser(TestCase):
+    def test_object_type_parser_throws_without_ref_cache(self):
+        parser = ObjectTypeParser()
+
+        properties = {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+            },
+        }
+
+        with self.assertRaises(InternalAssertionException):
+            parser.from_properties_impl("placeholder", properties)
+
     def test_object_type_parser(self):
         parser = ObjectTypeParser()
 
@@ -15,7 +30,9 @@ class TestObjectTypeParser(TestCase):
             },
         }
 
-        Model, _args = parser.from_properties_impl("placeholder", properties)
+        Model, _args = parser.from_properties_impl(
+            "placeholder", properties, ref_cache={}
+        )
 
         obj = Model(name="name", age=10)
 
@@ -39,7 +56,9 @@ class TestObjectTypeParser(TestCase):
             ],
         }
 
-        _, type_validator = parser.from_properties_impl("placeholder", properties)
+        _, type_validator = parser.from_properties_impl(
+            "placeholder", properties, ref_cache={}
+        )
 
         test_example = type_validator["examples"][0]
 
@@ -61,7 +80,9 @@ class TestObjectTypeParser(TestCase):
             },
         }
 
-        _, type_validator = parser.from_properties_impl("placeholder", properties)
+        _, type_validator = parser.from_properties_impl(
+            "placeholder", properties, ref_cache={}
+        )
 
         # Check default value
         default_obj = type_validator["default_factory"]()
@@ -71,3 +92,18 @@ class TestObjectTypeParser(TestCase):
         # Chekc default factory new object id
         new_obj = type_validator["default_factory"]()
         self.assertNotEqual(id(default_obj), id(new_obj))
+
+    def test_object_type_parser_warns_if_object_override_in_cache(self):
+        ref_cache = {}
+
+        parser = ObjectTypeParser()
+
+        properties = {"type": "object", "properties": {}}
+
+        with self.assertWarns(UserWarning):
+            _, type_validator = parser.from_properties_impl(
+                "placeholder", properties, ref_cache=ref_cache
+            )
+            _, type_validator = parser.from_properties_impl(
+                "placeholder", properties, ref_cache=ref_cache
+            )

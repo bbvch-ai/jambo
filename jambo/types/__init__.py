@@ -4,7 +4,7 @@ from .json_schema_type import (
     JSONSchemaType,
     JSONType,
 )
-from .type_parser_options import TypeParserOptions
+from .type_parser_options import RefCacheDict, TypeParserOptions
 
 
 __all__ = [
@@ -12,5 +12,6 @@ __all__ = [
     "JSONSchemaNativeTypes",
     "JSONType",
     "JSONSchema",
+    "RefCacheDict",
     "TypeParserOptions",
 ]

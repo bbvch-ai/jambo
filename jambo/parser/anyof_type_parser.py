@@ -31,7 +31,7 @@ class AnyOfTypeParser(GenericTypeParser):
 
         sub_types = [
             GenericTypeParser.type_from_properties(
-                f"{name}_sub{i}", subProperty, **kwargs
+                f"{name}.sub{i}", subProperty, **kwargs
             )
             for i, subProperty in enumerate(sub_properties)
         ]

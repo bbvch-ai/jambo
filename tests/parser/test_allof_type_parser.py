@@ -42,7 +42,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         type_parsing, type_validator = AllOfTypeParser().from_properties(
-            "placeholder", properties
+            "placeholder", properties, ref_cache={}
         )
 
         with self.assertRaises(ValidationError):
@@ -87,7 +87,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         type_parsing, type_validator = AllOfTypeParser().from_properties(
-            "placeholder", properties
+            "placeholder", properties, ref_cache={}
         )
 
         with self.assertRaises(ValidationError):
@@ -116,7 +116,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         type_parsing, type_validator = AllOfTypeParser().from_properties(
-            "placeholder", properties
+            "placeholder", properties, ref_cache={}
         )
 
         self.assertEqual(type_parsing, str)
@@ -137,7 +137,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         type_parsing, type_validator = AllOfTypeParser().from_properties(
-            "placeholder", properties
+            "placeholder", properties, ref_cache={}
         )
 
         self.assertEqual(type_parsing, str)
@@ -158,7 +158,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            AllOfTypeParser().from_properties("placeholder", properties)
+            AllOfTypeParser().from_properties("placeholder", properties, ref_cache={})
 
     def test_all_of_invalid_type_not_present(self):
         properties = {
@@ -171,7 +171,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            AllOfTypeParser().from_properties("placeholder", properties)
+            AllOfTypeParser().from_properties("placeholder", properties, ref_cache={})
 
     def test_all_of_invalid_type_in_fields(self):
         properties = {
@@ -184,7 +184,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            AllOfTypeParser().from_properties("placeholder", properties)
+            AllOfTypeParser().from_properties("placeholder", properties, ref_cache={})
 
     def test_all_of_invalid_type_not_all_equal(self):
         """
@@ -200,7 +200,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            AllOfTypeParser().from_properties("placeholder", properties)
+            AllOfTypeParser().from_properties("placeholder", properties, ref_cache={})
 
     def test_all_of_description_field(self):
         """
@@ -237,7 +237,9 @@ class TestAllOfTypeParser(TestCase):
             ],
         }
 
-        type_parsing, _ = AllOfTypeParser().from_properties("placeholder", properties)
+        type_parsing, _ = AllOfTypeParser().from_properties(
+            "placeholder", properties, ref_cache={}
+        )
 
         self.assertEqual(
             type_parsing.model_json_schema()["properties"]["name"]["description"],
@@ -275,7 +277,9 @@ class TestAllOfTypeParser(TestCase):
             ],
         }
 
-        type_parsing, _ = AllOfTypeParser().from_properties("placeholder", properties)
+        type_parsing, _ = AllOfTypeParser().from_properties(
+            "placeholder", properties, ref_cache={}
+        )
         obj = type_parsing()
         self.assertEqual(obj.name, "John")
         self.assertEqual(obj.age, 30)
@@ -308,7 +312,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         with self.assertRaises(InvalidSchemaException):
-            AllOfTypeParser().from_properties("placeholder", properties)
+            AllOfTypeParser().from_properties("placeholder", properties, ref_cache={})
 
     def test_all_of_with_root_examples(self):
         """
@@ -344,7 +348,7 @@ class TestAllOfTypeParser(TestCase):
         }
 
         type_parsed, type_properties = AllOfTypeParser().from_properties(
-            "placeholder", properties
+            "placeholder", properties, ref_cache={}
         )
 
         self.assertEqual(
