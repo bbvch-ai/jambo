@@ -62,13 +62,7 @@ There are two ways to build models with Jambo:
 1. The original static API: `SchemaConverter.build(schema)` doesn't persist any reference cache between calls and doesn't require any configuration.
 2. The new instance API: use a `SchemaConverter()` instance and call `build_with_cache`, which exposes and persists a reference cache and helper methods.
 
-The instance API is useful when you want to reuse generated subtypes, inspect cached models, or share caches between converters. See the docs for full details: https://jambo.readthedocs.io/en/latest/usage.ref_cache.html
-
-
-> [!NOTE]
-> The use of the instance API and ref cache can cause schema and type name collisions if not managed carefully, therefore 
-> it's recommended that each namespace or schema source uses its own `SchemaConverter` instance.
-> If you don't need cache control, the static API is simpler and sufficient for most use cases.
+The instance API is useful when you want to reuse generated subtypes, inspect cached models, or share caches between converters; all leveraging namespaces via the `$id` property in JSON Schema. See the docs for full details: https://jambo.readthedocs.io/en/latest/usage.ref_cache.html
 
 
 ### Static (compatibility) example
