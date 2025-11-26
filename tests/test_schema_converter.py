@@ -1047,3 +1047,12 @@ class TestSchemaConverter(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             self.converter.build_with_cache(schema)
+
+    def test_parse_list_type_root_level_throws(self):
+        schema = {
+            "title": "TestListType",
+            "type": ["string", "number"]
+        }
+
+        with self.assertRaises(InvalidSchemaException):
+            self.converter.build_with_cache(schema)

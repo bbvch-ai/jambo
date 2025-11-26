@@ -138,9 +138,8 @@ class SchemaConverter:
         
         type_value = schema.get("type")
         if isinstance(type_value, list):
-            raise InternalAssertionException(
-                "SchemaConverter._get_schema_type: 'type' field should not be a list here."
-                " This should have been normalized earlier."
+            raise InvalidSchemaException(
+                "Invalid schema: 'type' cannot be a list at the top level", invalid_field=str(schema)
             )
 
         return type_value
