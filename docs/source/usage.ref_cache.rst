@@ -10,6 +10,12 @@ and :py:meth:`SchemaConverter.build <jambo.SchemaConverter.build>`.
 However, only :py:meth:`SchemaConverter.build_with_cache <jambo.SchemaConverter.build_with_cache>` exposes the cache through a supported API;
 :py:meth:`SchemaConverter.build <jambo.SchemaConverter.build>` uses the cache internally and does not provide access to it.
 
+The reference cache accepts a mutable mapping (typically a plain Python dict)
+that maps reference names (strings) to generated Pydantic model classes.
+Since only the reference names are stored it can cause name collisions if
+multiple schemas with overlapping names are processed using the same cache.
+Therefore, it's recommended that each namespace or schema source uses its own
+:class:`SchemaConverter` instance.
 
 -----------------------------------------
 Configuring and Using the Reference Cache
