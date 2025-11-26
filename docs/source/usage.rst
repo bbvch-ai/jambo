@@ -99,9 +99,9 @@ the instance method persists and exposes the reference cache and provides helper
 
 .. warning::
     The instance API with reference cache can lead to schema and type name collisions if not managed carefully.
-    It's recommended that each namespace or schema source uses its own `SchemaConverter` instance.
-    If you don't need cache control, the static API is simpler and sufficient for most use cases.
-
+    It's recommended that each schema defines its own unique namespace using the `$id` property in JSON Schema,
+    and that access it's ref_cache by passing it explicitly when needed.
+    
 For details and examples about the reference cache and the different cache modes (instance cache, per-call cache, ephemeral cache), see:
 
 .. toctree::

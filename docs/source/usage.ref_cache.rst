@@ -86,7 +86,31 @@ reference cache (a plain dict). Reusing the same converter instance across
 multiple calls will reuse that cache and therefore reuse previously generated
 model classes.
 
+That cache is isolated per namespace via the `$id` property in JSON Schema, so
+schemas with different `$id` values will not collide in the same cache.
+
 .. code-block:: python
+
+    from jambo import SchemaConverter
+
+    # no $id in this example, therefore a default namespace is used
+    schema = {
+        "title": "Person",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "age": {"type": "integer"},
+            "address": {
+                "type": "object",
+                "properties": {
+                    "street": {"type": "string"},
+                    "city": {"type": "string"},
+                },
+                "required": ["street", "city"],
+            },
+        },
+        "required": ["name", "address"],
+    }
 
     converter = SchemaConverter()  # has its own internal cache
 
@@ -95,6 +119,39 @@ model classes.
 
     # model1 and model2 are the same object because the instance cache persisted
     assert model1 is model2
+
+When passing a schema with a different `$id`, the instance cache keeps types
+separate:
+
+.. code-block:: python
+
+    schema_a = {
+        "$id": "namespace_a",
+        "title": "Person",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+        },
+        "required": ["name"],
+    }
+
+    schema_b = {
+        "$id": "namespace_b",
+        "title": "Person",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+        },
+        "required": ["name"],
+    }
+
+    converter = SchemaConverter()  # has its own internal cache
+
+    model_a = converter.build_with_cache(schema_a)
+    model_b = converter.build_with_cache(schema_b)
+
+    # different $id values isolate the types in the same cache
+    assert model_a is not model_b
 
 If you want to temporarily avoid using the instance cache for a single call,
 use ``without_cache=True``. That causes :py:meth:`SchemaConverter.build_with_cache <jambo.SchemaConverter.build_with_cache>` to
@@ -118,7 +175,7 @@ instance cache.
 Retrieving cached types
 -----------------------
 
-:py:meth:`SchemaConverter.get_cached_ref <jambo.SchemaConverter.get_cached_ref>`(name) — returns a cached model class or ``None``.
+:py:meth:`SchemaConverter.get_cached_ref <jambo.SchemaConverter.get_cached_ref>`(name, namespace="default") — returns a cached model class or ``None``.
 
 Retrieving the root type of the schema
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,10 +269,62 @@ When retrieving a type defined in ``$defs``, access it directly by its name.
     cached_address_model = converter.get_cached_ref("address")
 
 
+Isolation by Namespace
+~~~~~~~~~~~~~~~~~~~~~~
+
+The instance cache is isolated per namespace via the `$id` property in JSON Schema.
+When retrieving a cached type, you can specify the namespace to look in
+(via the ``namespace`` parameter). By default, the ``default`` namespace is used
+
+
+.. code-block:: python
+
+    from jambo import SchemaConverter
+
+    converter = SchemaConverter()
+
+    schema_a = {
+        "$id": "namespace_a",
+        "title": "Person",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+        },
+        "required": ["name"],
+    }
+
+    schema_b = {
+        "$id": "namespace_b",
+        "title": "Person",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+        },
+        "required": ["name"],
+    }
+
+    person_a = converter.build_with_cache(schema_a)
+    person_b = converter.build_with_cache(schema_b)
+
+    cached_person_a = converter.get_cached_ref("Person", namespace="namespace_a")
+    cached_person_b = converter.get_cached_ref("Person", namespace="namespace_b")
+
+    assert cached_person_a is person_a
+    assert cached_person_b is person_b
+
+
 Clearing the cache
 ------------------
 
-:py:meth:`SchemaConverter.clear_ref_cache <jambo.SchemaConverter.clear_ref_cache>`() — removes all entries from the instance cache.
+:py:meth:`SchemaConverter.clear_ref_cache <jambo.SchemaConverter.clear_ref_cache>`(namespace: Optional[str]="default") — removes all entries from the instance cache.
+
+
+When you want to clear the instance cache, use :py:meth:`SchemaConverter.clear_ref_cache <jambo.SchemaConverter.clear_ref_cache>`.
+You can optionally specify a ``namespace`` to clear only that namespace;
+otherwise, the default namespace is cleared.
+
+If you want to clear all namespaces, call :py:meth:`SchemaConverter.clear_ref_cache <jambo.SchemaConverter.clear_ref_cache>` passing `None` as the namespace,
+which removes all entries from all namespaces.
 
 
 Notes and Behavioural Differences
