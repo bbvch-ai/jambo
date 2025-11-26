@@ -19,7 +19,7 @@ class TestSchemaConverter(TestCase):
         self.converter = SchemaConverter()
 
     def tearDown(self):
-        self.converter.clear_ref_cache()
+        self.converter.clear_ref_cache(namespace=None)
 
     def test_invalid_schema(self):
         schema = {
