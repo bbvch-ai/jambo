@@ -22,7 +22,7 @@ class SchemaConverter:
             ref_cache = dict()
         self._ref_cache = ref_cache
 
-    def build_with_instance(
+    def build_with_cache(
         self,
         schema: JSONSchema,
         ref_cache: Optional[RefCacheDict] = None,
@@ -55,6 +55,7 @@ class SchemaConverter:
     ) -> type[BaseModel]:
         """
         Converts a JSON Schema to a Pydantic model.
+        This method doesn't use a reference cache if none is provided.
             :param schema: The JSON Schema to convert.
             :param ref_cache: An optional reference cache to use during conversion, if provided `with_clean_cache` will be ignored.
             :return: The generated Pydantic model.
