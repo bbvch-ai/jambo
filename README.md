@@ -1,8 +1,8 @@
 # Jambo - JSON Schema to Pydantic Converter
 
-<p align="center">
+<p style="text-align:center">
 <a href="https://github.com/HideyoshiNakazone/jambo" target="_blank">
- <img src="https://img.shields.io/github/last-commit/HideyoshiNakazone/jambo.svg">
+ <img src="https://img.shields.io/github/last-commit/HideyoshiNakazone/jambo.svg" alt="Last commit">
  <img src="https://github.com/HideyoshiNakazone/jambo/actions/workflows/build.yml/badge.svg" alt="Tests">
 </a>
 <a href="https://codecov.io/gh/HideyoshiNakazone/jambo" target="_blank">
@@ -19,11 +19,12 @@
 </p>
 
 **Jambo** is a Python package that automatically converts [JSON Schema](https://json-schema.org/) definitions into [Pydantic](https://docs.pydantic.dev/) models. 
-It's designed to streamline schema validation and enforce type safety using Pydantic's powerful validation features.
+It's designed to streamline schema validation and enforce type safety using Pydantic's validation features.
 
-Created to simplifying the process of dynamically generating Pydantic models for AI frameworks like [LangChain](https://www.langchain.com/), [CrewAI](https://www.crewai.com/), and others.
+Created to simplify the process of dynamically generating Pydantic models for AI frameworks like [LangChain](https://www.langchain.com/), [CrewAI](https://www.crewai.com/), and others.
 
 ---
+
 
 ## ✨ Features
 
@@ -56,9 +57,24 @@ pip install jambo
 
 ## 🚀 Usage
 
+There are two ways to build models with Jambo:
+
+1. The original static API: `SchemaConverter.build(schema)` doesn't persist any reference cache between calls and doesn't require any configuration.
+2. The new instance API: use a `SchemaConverter()` instance and call `build_with_cache`, which exposes and persists a reference cache and helper methods.
+
+The instance API is useful when you want to reuse generated subtypes, inspect cached models, or share caches between converters. See the docs for full details: https://jambo.readthedocs.io/en/latest/usage.ref_cache.html
+
+
+> [!NOTE]
+> The use of the instance API and ref cache can cause schema and type name collisions if not managed carefully, therefore 
+> it's recommended that each namespace or schema source uses its own `SchemaConverter` instance.
+> If you don't need cache control, the static API is simpler and sufficient for most use cases.
+
+
+### Static (compatibility) example
+
 ```python
 from jambo import SchemaConverter
-
 
 schema = {
     "title": "Person",
@@ -70,10 +86,38 @@ schema = {
     "required": ["name"],
 }
 
+# Old-style convenience API (kept for compatibility)
 Person = SchemaConverter.build(schema)
 
 obj = Person(name="Alice", age=30)
 print(obj)
+```
+
+### Instance API (recommended for cache control)
+
+```python
+from jambo import SchemaConverter
+
+converter = SchemaConverter()
+
+schema = {
+    "title": "Person",
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "age": {"type": "integer"},
+        "address": {"type": "object", "properties": {"street": {"type": "string"}}},
+    },
+    "required": ["name"],
+}
+
+# build_with_cache populates the converter's instance-level ref cache
+Person = converter.build_with_cache(schema)
+
+# you can retrieve cached subtypes by name/path
+cached_person = converter.get_cached_ref("Person")
+# clear the instance cache when needed
+converter.clear_ref_cache()
 ```
 
 ---

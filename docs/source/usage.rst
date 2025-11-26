@@ -42,7 +42,7 @@ Static Method (no config)
 
 The :py:meth:`SchemaConverter.build <jambo.SchemaConverter.build>` static method takes a JSON Schema dictionary and returns a Pydantic model class.
 
-Note: the static ``build`` method was the original public API of this library and is kept for backwards compatibility. It creates and returns a model class for the provided schema but does not expose or persist an instance cache.
+Note: the static ``build`` method was the original public API of this library. It creates and returns a model class for the provided schema but does not expose or persist an instance cache.
 
 
 --------------------------------
@@ -96,6 +96,11 @@ Unlike the original static :py:meth:`SchemaConverter.build <jambo.SchemaConverte
 the instance method persists and exposes the reference cache and provides helpers such as
 :py:meth:`SchemaConverter.get_cached_ref <jambo.SchemaConverter.get_cached_ref>` and
 :py:meth:`SchemaConverter.clear_ref_cache <jambo.SchemaConverter.clear_ref_cache>`.
+
+.. warning::
+    The instance API with reference cache can lead to schema and type name collisions if not managed carefully.
+    It's recommended that each namespace or schema source uses its own `SchemaConverter` instance.
+    If you don't need cache control, the static API is simpler and sufficient for most use cases.
 
 For details and examples about the reference cache and the different cache modes (instance cache, per-call cache, ephemeral cache), see:
 
