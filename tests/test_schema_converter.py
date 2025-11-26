@@ -1003,11 +1003,7 @@ class TestSchemaConverter(TestCase):
         schema = {
             "title": "TestListType",
             "type": "object",
-            "properties": {
-                "values": {
-                    "type": ["string", "number"]
-                }
-            },
+            "properties": {"values": {"type": ["string", "number"]}},
         }
 
         Model = self.converter.build_with_cache(schema)
@@ -1022,11 +1018,7 @@ class TestSchemaConverter(TestCase):
         schema = {
             "title": "TestListType",
             "type": "object",
-            "properties": {
-                "values": {
-                    "type": ["string"]
-                }
-            },
+            "properties": {"values": {"type": ["string"]}},
         }
 
         Model = self.converter.build_with_cache(schema)
@@ -1038,21 +1030,14 @@ class TestSchemaConverter(TestCase):
         schema = {
             "title": "TestListType",
             "type": "object",
-            "properties": {
-                "values": {
-                    "type": []
-                }
-            },
+            "properties": {"values": {"type": []}},
         }
 
         with self.assertRaises(InvalidSchemaException):
             self.converter.build_with_cache(schema)
 
     def test_parse_list_type_root_level_throws(self):
-        schema = {
-            "title": "TestListType",
-            "type": ["string", "number"]
-        }
+        schema = {"title": "TestListType", "type": ["string", "number"]}
 
         with self.assertRaises(InvalidSchemaException):
             self.converter.build_with_cache(schema)

@@ -1,4 +1,4 @@
-from jambo.exceptions import InternalAssertionException, InvalidSchemaException, UnsupportedSchemaException
+from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
 from jambo.parser import ObjectTypeParser, RefTypeParser
 from jambo.types import JSONSchema, RefCacheDict
 
@@ -135,11 +135,12 @@ class SchemaConverter:
         """
         if "$ref" in schema:
             return "$ref"
-        
+
         type_value = schema.get("type")
         if isinstance(type_value, list):
             raise InvalidSchemaException(
-                "Invalid schema: 'type' cannot be a list at the top level", invalid_field=str(schema)
+                "Invalid schema: 'type' cannot be a list at the top level",
+                invalid_field=str(schema),
             )
 
         return type_value
