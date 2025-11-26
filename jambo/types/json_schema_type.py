@@ -42,7 +42,7 @@ JSONSchema = TypedDict(
         "description": str,
         "default": JSONType,
         "examples": List[JSONType],
-        "type": JSONSchemaType,
+        "type": JSONSchemaType|List[JSONSchemaType],
         "enum": List[JSONType],
         "const": JSONType,
         "properties": Dict[str, "JSONSchema"],

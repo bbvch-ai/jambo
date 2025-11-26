@@ -1,4 +1,4 @@
-from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
+from jambo.exceptions import InternalAssertionException, InvalidSchemaException, UnsupportedSchemaException
 from jambo.parser import ObjectTypeParser, RefTypeParser
 from jambo.types import JSONSchema, RefCacheDict
 
@@ -135,5 +135,12 @@ class SchemaConverter:
         """
         if "$ref" in schema:
             return "$ref"
+        
+        type_value = schema.get("type")
+        if isinstance(type_value, list):
+            raise InternalAssertionException(
+                "SchemaConverter._get_schema_type: 'type' field should not be a list here."
+                " This should have been normalized earlier."
+            )
 
-        return schema.get("type")
+        return type_value
