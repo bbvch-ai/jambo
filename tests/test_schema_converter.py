@@ -998,3 +998,46 @@ class TestSchemaConverter(TestCase):
         cached_address_model = self.converter.get_cached_ref("address")
 
         self.assertIsNotNone(cached_address_model)
+
+    def test_parse_list_type_multiple_values(self):
+        schema = {
+            "title": "TestListType",
+            "type": "object",
+            "properties": {"values": {"type": ["string", "number"]}},
+        }
+
+        Model = self.converter.build_with_cache(schema)
+
+        obj1 = Model(values="a string")
+        self.assertEqual(obj1.values, "a string")
+
+        obj2 = Model(values=42)
+        self.assertEqual(obj2.values, 42)
+
+    def test_parse_list_type_one_value(self):
+        schema = {
+            "title": "TestListType",
+            "type": "object",
+            "properties": {"values": {"type": ["string"]}},
+        }
+
+        Model = self.converter.build_with_cache(schema)
+
+        obj1 = Model(values="a string")
+        self.assertEqual(obj1.values, "a string")
+
+    def test_parse_list_type_empty(self):
+        schema = {
+            "title": "TestListType",
+            "type": "object",
+            "properties": {"values": {"type": []}},
+        }
+
+        with self.assertRaises(InvalidSchemaException):
+            self.converter.build_with_cache(schema)
+
+    def test_parse_list_type_root_level_throws(self):
+        schema = {"title": "TestListType", "type": ["string", "number"]}
+
+        with self.assertRaises(InvalidSchemaException):
+            self.converter.build_with_cache(schema)

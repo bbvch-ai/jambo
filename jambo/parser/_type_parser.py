@@ -73,9 +73,38 @@ class GenericTypeParser(ABC, Generic[T]):
         :param kwargs: Additional options for type parsing.
         :return: A tuple containing the type and its properties.
         """
-        parser = cls._get_impl(properties)
+
+        parser = cls._get_impl(cls._normalize_properties(properties))
 
         return parser().from_properties(name=name, properties=properties, **kwargs)
+
+    @staticmethod
+    def _normalize_properties(properties: JSONSchema) -> JSONSchema:
+        """
+        Normalizes the properties dictionary to ensure consistent structure.
+        :param properties: The properties to be normalized.
+        """
+        type_value = properties.pop("type", None)
+
+        if isinstance(type_value, str):
+            properties["type"] = type_value
+            return properties
+
+        if isinstance(type_value, list) and len(type_value) == 0:
+            raise InvalidSchemaException(
+                "Invalid schema: 'type' list cannot be empty",
+                invalid_field=str(properties),
+            )
+
+        if isinstance(type_value, list) and len(type_value) == 1:
+            properties["type"] = type_value[0]
+            return properties
+
+        if isinstance(type_value, list):
+            properties["anyOf"] = [{"type": t} for t in type_value]
+            return properties
+
+        return properties
 
     @classmethod
     def _get_impl(cls, properties: JSONSchema) -> type[Self]:

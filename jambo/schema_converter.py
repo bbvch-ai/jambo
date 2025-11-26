@@ -136,4 +136,11 @@ class SchemaConverter:
         if "$ref" in schema:
             return "$ref"
 
-        return schema.get("type")
+        type_value = schema.get("type")
+        if isinstance(type_value, list):
+            raise InvalidSchemaException(
+                "Invalid schema: 'type' cannot be a list at the top level",
+                invalid_field=str(schema),
+            )
+
+        return type_value
