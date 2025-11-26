@@ -17,10 +17,12 @@ class SchemaConverter:
     fields and types. The generated model can be used for data validation and serialization.
     """
 
-    def __init__(self, ref_cache: Optional[RefCacheDict] = None) -> None:
-        if ref_cache is None:
-            ref_cache = dict()
-        self._ref_cache = ref_cache
+    def __init__(
+        self, namespace_registry: Optional[dict[str, RefCacheDict]] = None
+    ) -> None:
+        if namespace_registry is None:
+            namespace_registry = dict()
+        self._namespace_registry = namespace_registry
 
     def build_with_cache(
         self,
@@ -43,7 +45,8 @@ class SchemaConverter:
         if without_cache:
             local_ref_cache = dict()
         elif ref_cache is None:
-            local_ref_cache = self._ref_cache
+            namespace = schema.get("$id", "default")
+            local_ref_cache = self._namespace_registry.setdefault(namespace, dict())
         else:
             local_ref_cache = ref_cache
 
@@ -107,19 +110,28 @@ class SchemaConverter:
                     unsupported_field=unsupported_type,
                 )
 
-    def clear_ref_cache(self) -> None:
+    def clear_ref_cache(self, namespace: Optional[str] = "default") -> None:
         """
         Clears the reference cache.
         """
-        self._ref_cache.clear()
+        if namespace is None:
+            self._namespace_registry.clear()
+            return
 
-    def get_cached_ref(self, ref_name: str):
+        if namespace in self._namespace_registry:
+            self._namespace_registry[namespace].clear()
+
+    def get_cached_ref(
+        self, ref_name: str, namespace: str = "default"
+    ) -> Optional[type]:
         """
         Gets a cached reference from the reference cache.
         :param ref_name: The name of the reference to get.
         :return: The cached reference, or None if not found.
-        """
-        cached_type = self._ref_cache.get(ref_name)
+        """        
+        cached_type = self._namespace_registry.get(
+            namespace, {}
+        ).get(ref_name)
 
         if isinstance(cached_type, type):
             return cached_type

@@ -877,7 +877,6 @@ class TestSchemaConverter(TestCase):
         converter2 = SchemaConverter(ref_cache)
         model2 = converter2.build_with_cache(schema)
 
-        self.assertIs(converter1._ref_cache, converter2._ref_cache)
         self.assertIs(model1, model2)
 
     def test_instance_level_ref_cache_isolation_via_without_cache_param(self):
@@ -1041,3 +1040,131 @@ class TestSchemaConverter(TestCase):
 
         with self.assertRaises(InvalidSchemaException):
             self.converter.build_with_cache(schema)
+
+    def tests_instance_level_ref_cache_isolation_via_property_id(self):
+        schema1: JSONSchema = {
+            "$id": "http://example.com/schemas/person1.json",
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model1 = self.converter.build_with_cache(schema1)
+
+        schema2: JSONSchema = {
+            "$id": "http://example.com/schemas/person2.json",
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {"type": "string"},
+            },
+            "required": ["name", "age", "address"],
+        }
+
+        model2 = self.converter.build_with_cache(schema2)
+
+        self.assertIsNot(model1, model2)
+
+    def tests_instance_level_ref_cache_colision_when_same_property_id(self):
+        schema1: JSONSchema = {
+            "$id": "http://example.com/schemas/person.json",
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model1 = self.converter.build_with_cache(schema1)
+
+        schema2: JSONSchema = {
+            "$id": "http://example.com/schemas/person.json",
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {"type": "string"},
+            },
+            "required": ["name", "age", "address"],
+        }
+
+        model2 = self.converter.build_with_cache(schema2)
+
+        self.assertIs(model1, model2)
+
+    def test_namespace_isolation_via_on_call_config(self):
+        namespace = "namespace1"
+        
+        schema: JSONSchema = {
+            "$id": namespace,
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street": {"type": "string"},
+                        "city": {"type": "string"},
+                    },
+                    "required": ["street", "city"],
+                },
+            },
+            "required": ["name", "age", "address"],
+        }
+
+        model = self.converter.build_with_cache(schema)
+        
+        invalid_cached_model = self.converter.get_cached_ref("Person")
+        self.assertIsNone(invalid_cached_model)
+        
+        cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
+        self.assertIs(model, cached_model)
+
+    def test_clear_namespace_registry(self):
+        namespace = "namespace_to_clear"
+        
+        schema: JSONSchema = {
+            "$id": namespace,
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "address": {
+                    "type": "object",
+                    "properties": {
+                        "street": {"type": "string"},
+                        "city": {"type": "string"},
+                    },
+                    "required": ["street", "city"],
+                },
+            },
+            "required": ["name", "age", "address"],
+        }
+
+        model = self.converter.build_with_cache(schema)
+        
+        cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
+        self.assertIs(model, cached_model)
+        
+        self.converter.clear_ref_cache(namespace=namespace)
+        
+        cleared_cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
+        self.assertIsNone(cleared_cached_model)
