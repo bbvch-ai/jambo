@@ -42,8 +42,12 @@ class AnyOfTypeParser(GenericTypeParser):
         # By defining the type as Union of Annotated type we can use the Field validator
         # to enforce the constraints of each union type when needed.
         # We use Annotated to attach the Field validators to the type.
-        field_types = [
-            Annotated[t, Field(**v)] if v is not None else t for t, v in sub_types
-        ]
+        field_types = []
+        for subType, subProp in sub_types:
+            default_value = subProp.pop("default", None)
+            if default_value is None:
+                default_value = ...
+
+            field_types.append(Annotated[subType, Field(default_value, **subProp)])
 
         return Union[(*field_types,)], mapped_properties
