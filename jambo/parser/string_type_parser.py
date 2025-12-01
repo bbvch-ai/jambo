@@ -2,8 +2,8 @@ from jambo.exceptions import InvalidSchemaException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import AnyUrl, EmailStr
-from typing_extensions import Any, Unpack
+from pydantic import AnyUrl, EmailStr, TypeAdapter
+from typing_extensions import Unpack
 
 from datetime import date, datetime, time, timedelta
 from ipaddress import IPv4Address, IPv6Address
@@ -64,7 +64,7 @@ class StringTypeParser(GenericTypeParser):
 
         if "examples" in mapped_properties:
             mapped_properties["examples"] = [
-                self._parse_example(example, format_type, mapped_type)
+                TypeAdapter(mapped_type).validate_python(example)
                 for example in mapped_properties["examples"]
             ]
 
@@ -73,26 +73,3 @@ class StringTypeParser(GenericTypeParser):
         mapped_properties["json_schema_extra"]["format"] = format_type
 
         return mapped_type, mapped_properties
-
-    def _parse_example(
-        self, example: Any, format_type: str, mapped_type: type[Any]
-    ) -> Any:
-        """
-        Parse example from JSON Schema format to python format
-        :param example: Example Value
-        :param format_type: Format Type
-        :param mapped_type: Type to parse
-        :return: Example parsed
-        """
-        match format_type:
-            case "date" | "time" | "date-time":
-                return mapped_type.fromisoformat(example)
-            case "duration":
-                # TODO: Implement duration parser
-                raise NotImplementedError
-            case "ipv4" | "ipv6":
-                return mapped_type(example)
-            case "uuid":
-                return mapped_type(example)
-            case _:
-                return example
