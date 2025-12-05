@@ -2,7 +2,7 @@ from jambo.exceptions import InvalidSchemaException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import AnyUrl, EmailStr, TypeAdapter
+from pydantic import AnyUrl, EmailStr, TypeAdapter, ValidationError
 from typing_extensions import Unpack
 
 from datetime import date, datetime, time, timedelta
@@ -62,11 +62,16 @@ class StringTypeParser(GenericTypeParser):
         if format_type in self.format_pattern_mapping:
             mapped_properties["pattern"] = self.format_pattern_mapping[format_type]
 
-        if "examples" in mapped_properties:
-            mapped_properties["examples"] = [
-                TypeAdapter(mapped_type).validate_python(example)
-                for example in mapped_properties["examples"]
-            ]
+        try:
+            if "examples" in mapped_properties:
+                mapped_properties["examples"] = [
+                    TypeAdapter(mapped_type).validate_python(example)
+                    for example in mapped_properties["examples"]
+                ]
+        except ValidationError as err:
+            raise InvalidSchemaException(
+                f"Invalid example type for field {name}."
+            ) from err
 
         if "json_schema_extra" not in mapped_properties:
             mapped_properties["json_schema_extra"] = {}
