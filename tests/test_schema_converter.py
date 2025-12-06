@@ -1109,7 +1109,7 @@ class TestSchemaConverter(TestCase):
 
     def test_namespace_isolation_via_on_call_config(self):
         namespace = "namespace1"
-        
+
         schema: JSONSchema = {
             "$id": namespace,
             "title": "Person",
@@ -1130,16 +1130,16 @@ class TestSchemaConverter(TestCase):
         }
 
         model = self.converter.build_with_cache(schema)
-        
+
         invalid_cached_model = self.converter.get_cached_ref("Person")
         self.assertIsNone(invalid_cached_model)
-        
+
         cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
         self.assertIs(model, cached_model)
 
     def test_clear_namespace_registry(self):
         namespace = "namespace_to_clear"
-        
+
         schema: JSONSchema = {
             "$id": namespace,
             "title": "Person",
@@ -1160,11 +1160,13 @@ class TestSchemaConverter(TestCase):
         }
 
         model = self.converter.build_with_cache(schema)
-        
+
         cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
         self.assertIs(model, cached_model)
-        
+
         self.converter.clear_ref_cache(namespace=namespace)
-        
-        cleared_cached_model = self.converter.get_cached_ref("Person", namespace=namespace)
+
+        cleared_cached_model = self.converter.get_cached_ref(
+            "Person", namespace=namespace
+        )
         self.assertIsNone(cleared_cached_model)

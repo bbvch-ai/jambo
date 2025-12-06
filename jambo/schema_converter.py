@@ -128,10 +128,8 @@ class SchemaConverter:
         Gets a cached reference from the reference cache.
         :param ref_name: The name of the reference to get.
         :return: The cached reference, or None if not found.
-        """        
-        cached_type = self._namespace_registry.get(
-            namespace, {}
-        ).get(ref_name)
+        """
+        cached_type = self._namespace_registry.get(namespace, {}).get(ref_name)
 
         if isinstance(cached_type, type):
             return cached_type

@@ -3,7 +3,6 @@ from jambo.parser import StringTypeParser
 
 from pydantic import AnyUrl, EmailStr
 
-import unittest
 from datetime import date, datetime, time, timedelta, timezone
 from ipaddress import IPv4Address, IPv6Address, ip_address
 from unittest import TestCase
@@ -121,7 +120,7 @@ class TestStringTypeParser(TestCase):
         type_parsing, type_validator = parser.from_properties("placeholder", properties)
 
         self.assertEqual(type_parsing, AnyUrl)
-        self.assertEqual(type_validator["examples"], ["test://domain/resource"])
+        self.assertEqual(type_validator["examples"], [AnyUrl("test://domain/resource")])
 
     def test_string_parser_with_ip_formats(self):
         parser = StringTypeParser()
@@ -299,7 +298,6 @@ class TestStringTypeParser(TestCase):
                 },
             )
 
-    @unittest.skip("Duration parsing not yet implemented")
     def test_string_parser_with_timedelta_format(self):
         parser = StringTypeParser()
 
@@ -315,9 +313,9 @@ class TestStringTypeParser(TestCase):
         self.assertEqual(
             type_validator["examples"],
             [
-                timedelta(days=7),
+                timedelta(days=428, hours=4, minutes=5, seconds=6),
                 timedelta(minutes=30),
-                timedelta(hours=4, minutes=5, seconds=6),
+                timedelta(days=7),
                 timedelta(seconds=0.5),
             ],
         )
