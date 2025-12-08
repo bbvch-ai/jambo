@@ -66,7 +66,7 @@ class SchemaConverter:
             :return: The generated Pydantic model.
         """
         if ref_cache is None:
-            ref_cache: RefCacheDict = dict()
+            ref_cache = dict()
 
         try:
             validator = validator_for(schema)
