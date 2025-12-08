@@ -5,7 +5,7 @@ from jambo.types import JSONSchema, RefCacheDict
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import validator_for
 from pydantic import BaseModel
-from typing_extensions import Optional
+from typing_extensions import MutableMapping, Optional
 
 
 class SchemaConverter:
@@ -17,8 +17,10 @@ class SchemaConverter:
     fields and types. The generated model can be used for data validation and serialization.
     """
 
+    _namespace_registry: MutableMapping[str, RefCacheDict]
+
     def __init__(
-        self, namespace_registry: Optional[dict[str, RefCacheDict]] = None
+        self, namespace_registry: Optional[MutableMapping[str, RefCacheDict]] = None
     ) -> None:
         if namespace_registry is None:
             namespace_registry = dict()
