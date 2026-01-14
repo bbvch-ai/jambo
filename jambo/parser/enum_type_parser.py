@@ -36,6 +36,8 @@ class EnumTypeParser(GenericTypeParser):
 
         # Create a new Enum type dynamically
         enum_type = Enum(name, {str(value).upper(): value for value in enum_values})  # type: ignore
+        enum_type.__doc__ = properties.get("description")
+
         parsed_properties = self.mappings_properties_builder(properties, **kwargs)
 
         if "default" in parsed_properties and parsed_properties["default"] is not None:

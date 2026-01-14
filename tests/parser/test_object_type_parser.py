@@ -24,6 +24,7 @@ class TestObjectTypeParser(TestCase):
 
         properties = {
             "type": "object",
+            "description": "obj desc",
             "properties": {
                 "name": {"type": "string"},
                 "age": {"type": "integer"},
@@ -33,6 +34,7 @@ class TestObjectTypeParser(TestCase):
         Model, _args = parser.from_properties_impl(
             "placeholder", properties, ref_cache={}
         )
+        self.assertEqual(Model.__doc__, "obj desc")
 
         obj = Model(name="name", age=10)
 

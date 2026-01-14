@@ -89,6 +89,7 @@ class SchemaConverter:
                     schema["title"],
                     schema.get("properties", {}),
                     schema.get("required", []),
+                    description=schema.get("description"),
                     context=schema,
                     ref_cache=ref_cache,
                     required=True,

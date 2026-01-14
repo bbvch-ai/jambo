@@ -274,6 +274,7 @@ class TestSchemaConverter(TestCase):
         }
 
         model = self.converter.build_with_cache(schema)
+        self.assertEqual(model.__doc__, "A person")
 
         obj = model(address={"street": "123 Main St", "city": "Springfield"})
 
