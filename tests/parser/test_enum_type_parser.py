@@ -49,6 +49,20 @@ class TestEnumTypeParser(TestCase):
         )
         self.assertEqual(parsed_properties, {"default": None})
 
+    def test_enum_type_parser_creates_enum_with_description(self):
+        parser = EnumTypeParser()
+
+        schema = {
+            "description": "an enum",
+            "enum": ["value1"],
+        }
+
+        parsed_type, parsed_properties = parser.from_properties_impl(
+            "TestEnum",
+            schema,
+        )
+        self.assertEqual(parsed_type.__doc__, "an enum")
+
     def test_enum_type_parser_creates_enum_with_default(self):
         parser = EnumTypeParser()
 
