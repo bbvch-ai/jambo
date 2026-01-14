@@ -22,6 +22,7 @@ class ObjectTypeParser(GenericTypeParser):
             name,
             properties.get("properties", {}),
             properties.get("required", []),
+            description=properties.get("description"),
             **kwargs,
         )
         type_properties = self.mappings_properties_builder(properties, **kwargs)
@@ -48,6 +49,7 @@ class ObjectTypeParser(GenericTypeParser):
         name: str,
         properties: dict[str, JSONSchema],
         required_keys: list[str],
+        description: str | None = None,
         **kwargs: Unpack[TypeParserOptions],
     ) -> type[BaseModel]:
         """
@@ -74,7 +76,9 @@ class ObjectTypeParser(GenericTypeParser):
         model_config = ConfigDict(validate_assignment=True)
         fields = cls._parse_properties(name, properties, required_keys, **kwargs)
 
-        model = create_model(name, __config__=model_config, **fields)  # type: ignore
+        model = create_model(
+            name, __config__=model_config, __doc__=description, **fields
+        )  # type: ignore
         ref_cache[name] = model
 
         return model
