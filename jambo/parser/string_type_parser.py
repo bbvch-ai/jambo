@@ -2,7 +2,7 @@ from jambo.exceptions import InvalidSchemaException
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import AnyUrl, EmailStr, TypeAdapter, ValidationError
+from pydantic import AnyUrl, EmailStr, FilePath, TypeAdapter, ValidationError
 from typing_extensions import Unpack
 
 from datetime import date, datetime, time, timedelta
@@ -38,6 +38,9 @@ class StringTypeParser(GenericTypeParser):
         "uri": AnyUrl,
         # "iri" # Not supported by pydantic and currently not supported by jambo
         "uuid": UUID,
+        # Additional formats
+        "binary": bytes,
+        "file-path": FilePath,
     }
 
     format_pattern_mapping = {

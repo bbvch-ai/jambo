@@ -1,7 +1,7 @@
 from jambo.exceptions import InvalidSchemaException
 from jambo.parser import StringTypeParser
 
-from pydantic import AnyUrl, EmailStr
+from pydantic import AnyUrl, EmailStr, FilePath
 
 from datetime import date, datetime, time, timedelta, timezone
 from ipaddress import IPv4Address, IPv6Address, ip_address
@@ -319,3 +319,27 @@ class TestStringTypeParser(TestCase):
                 timedelta(seconds=0.5),
             ],
         )
+
+    def test_string_parser_with_binary_format(self):
+        parser = StringTypeParser()
+
+        properties = {
+            "type": "string",
+            "format": "binary",
+        }
+
+        type_parsing, type_validator = parser.from_properties("placeholder", properties)
+
+        self.assertEqual(type_parsing, bytes)
+
+    def test_string_parser_with_file_path_format(self):
+        parser = StringTypeParser()
+
+        properties = {
+            "type": "string",
+            "format": "file-path",
+        }
+
+        type_parsing, type_validator = parser.from_properties("placeholder", properties)
+
+        self.assertEqual(type_parsing, FilePath)
