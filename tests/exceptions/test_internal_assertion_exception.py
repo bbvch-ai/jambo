@@ -1,4 +1,4 @@
-from jambo.exceptions.internal_assertion_exception import InternalAssertionException
+from swiss_ai_hub.jambo.exceptions.internal_assertion_exception import InternalAssertionException
 
 from unittest import TestCase
 

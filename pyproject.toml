@@ -1,10 +1,13 @@
 [project]
-name = "jambo"
+name = "swiss-ai-hub-jambo"
 dynamic = ["version"]
-description = "Jambo - JSON Schema to Pydantic Converter"
+description = "JSON Schema to Pydantic converter — Swiss AI Hub fork of jambo (adds binary and file-path string format support). Imports as swiss_ai_hub.jambo."
 requires-python = ">=3.10,<4.0"
-maintainers = [
+authors = [
     { name = "Vitor Hideyoshi", email = "vitor.h.n.batista@gmail.com" },
+]
+maintainers = [
+    { name = "Joel Barmettler", email = "joel.barmettler@bbv.ch" },
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -45,8 +48,9 @@ dev = [
 
 
 [project.urls]
-homepage = "https://github.com/HideyoshiNakazone/jambo"
-repository = "https://github.com/HideyoshiNakazone/jambo.git"
+Homepage = "https://github.com/bbvch-ai/jambo"
+Repository = "https://github.com/bbvch-ai/jambo.git"
+Upstream = "https://github.com/HideyoshiNakazone/jambo"
 
 
 # POE Tasks
@@ -54,12 +58,19 @@ repository = "https://github.com/HideyoshiNakazone/jambo.git"
 create-hooks        = "bash .githooks/set-hooks.sh"
 tests               = "python -m coverage run -m unittest discover -v"
 tests-report        = "python -m coverage xml"
-type-check          = "mypy jambo"
+type-check          = "mypy swiss_ai_hub/jambo"
 serve-docs          = "sphinx-autobuild docs/source docs/build"
 
 # Build System
 [tool.hatch.version]
 source = "vcs"
+
+# Ship the package under the shared swiss_ai_hub namespace (PEP 420 native namespace:
+# no swiss_ai_hub/__init__.py is bundled, so it coexists with the other swiss_ai_hub.* dists).
+# `only-include` keeps the full swiss_ai_hub/jambo path in the wheel; `packages` would strip
+# the swiss_ai_hub parent and ship a bare top-level `jambo`.
+[tool.hatch.build.targets.wheel]
+only-include = ["swiss_ai_hub/jambo"]
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -79,7 +90,7 @@ omit = [
 extend-select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["jambo"]
+known-first-party = ["swiss_ai_hub"]
 section-order=[
     "future",
     "first-party",
@@ -92,4 +103,12 @@ lines-after-imports = 2
 
 [tool.pyright]
 venvPath = "."
-venv = ".venv" 
+venv = ".venv"
+
+# swiss_ai_hub is a PEP 420 native namespace (no __init__.py), so anchor the package base at
+# the repo root — otherwise mypy walks up to swiss_ai_hub/ and double-discovers files as both
+# `jambo.*` and `swiss_ai_hub.jambo.*`.
+[tool.mypy]
+mypy_path = "."
+namespace_packages = true
+explicit_package_bases = true

@@ -1,5 +1,5 @@
-from jambo.exceptions import InvalidSchemaException
-from jambo.parser import ArrayTypeParser
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.parser import ArrayTypeParser
 
 from typing_extensions import get_args
 

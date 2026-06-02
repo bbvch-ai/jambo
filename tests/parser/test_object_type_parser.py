@@ -1,5 +1,5 @@
-from jambo.exceptions import InternalAssertionException
-from jambo.parser import ObjectTypeParser
+from swiss_ai_hub.jambo.exceptions import InternalAssertionException
+from swiss_ai_hub.jambo.parser import ObjectTypeParser
 
 from unittest import TestCase
 

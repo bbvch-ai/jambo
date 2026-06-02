@@ -1,4 +1,4 @@
-from jambo.exceptions.unsupported_schema_exception import UnsupportedSchemaException
+from swiss_ai_hub.jambo.exceptions.unsupported_schema_exception import UnsupportedSchemaException
 
 from unittest import TestCase
 

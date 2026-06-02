@@ -1,8 +1,8 @@
-from jambo.exceptions import InternalAssertionException, InvalidSchemaException
-from jambo.parser import GenericTypeParser
-from jambo.types import RefCacheDict
-from jambo.types.json_schema_type import JSONSchema
-from jambo.types.type_parser_options import TypeParserOptions
+from swiss_ai_hub.jambo.exceptions import InternalAssertionException, InvalidSchemaException
+from swiss_ai_hub.jambo.parser import GenericTypeParser
+from swiss_ai_hub.jambo.types import RefCacheDict
+from swiss_ai_hub.jambo.types.json_schema_type import JSONSchema
+from swiss_ai_hub.jambo.types.type_parser_options import TypeParserOptions
 
 from typing_extensions import ForwardRef, Literal, Union, Unpack
 

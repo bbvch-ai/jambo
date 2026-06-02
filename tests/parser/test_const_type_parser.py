@@ -1,5 +1,5 @@
-from jambo.exceptions import InvalidSchemaException
-from jambo.parser import ConstTypeParser
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.parser import ConstTypeParser
 
 from typing_extensions import Annotated, Literal, get_args, get_origin
 

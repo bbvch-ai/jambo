@@ -1,5 +1,5 @@
-from jambo.exceptions import InvalidSchemaException
-from jambo.types.type_parser_options import JSONSchema, TypeParserOptions
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.types.type_parser_options import JSONSchema, TypeParserOptions
 
 from pydantic import Field, TypeAdapter
 from typing_extensions import Annotated, Any, ClassVar, Generic, Self, TypeVar, Unpack

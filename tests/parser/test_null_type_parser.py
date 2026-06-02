@@ -1,4 +1,4 @@
-from jambo.parser import NullTypeParser
+from swiss_ai_hub.jambo.parser import NullTypeParser
 
 from unittest import TestCase
 

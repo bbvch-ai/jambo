@@ -1,6 +1,6 @@
-from jambo import SchemaConverter
-from jambo.exceptions import InvalidSchemaException
-from jambo.parser.oneof_type_parser import OneOfTypeParser
+from swiss_ai_hub.jambo import SchemaConverter
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.parser.oneof_type_parser import OneOfTypeParser
 
 from pydantic import ValidationError
 

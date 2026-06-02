@@ -1,4 +1,4 @@
-from jambo.types.json_schema_type import JSONSchema
+from swiss_ai_hub.jambo.types.json_schema_type import JSONSchema
 
 from typing_extensions import ForwardRef, MutableMapping, TypedDict
 

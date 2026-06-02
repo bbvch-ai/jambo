@@ -1,5 +1,5 @@
-from jambo.exceptions import InternalAssertionException, InvalidSchemaException
-from jambo.parser import ObjectTypeParser, RefTypeParser
+from swiss_ai_hub.jambo.exceptions import InternalAssertionException, InvalidSchemaException
+from swiss_ai_hub.jambo.parser import ObjectTypeParser, RefTypeParser
 
 from pydantic import ValidationError
 from typing_extensions import ForwardRef

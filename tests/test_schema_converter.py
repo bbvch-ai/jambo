@@ -1,6 +1,6 @@
-from jambo import SchemaConverter
-from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
-from jambo.types import JSONSchema
+from swiss_ai_hub.jambo import SchemaConverter
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
+from swiss_ai_hub.jambo.types import JSONSchema
 
 from pydantic import AnyUrl, BaseModel, ValidationError
 from typing_extensions import get_args

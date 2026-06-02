@@ -18,30 +18,33 @@
 </a>
 </p>
 
-**Jambo** is a Python package that automatically converts [JSON Schema](https://json-schema.org/) definitions into [Pydantic](https://docs.pydantic.dev/) models. 
+> **Swiss AI Hub fork.** This is a fork of [`jambo`](https://github.com/HideyoshiNakazone/jambo) (MIT, by Vitor
+> Hideyoshi) published as **`swiss-ai-hub-jambo`** and imported as **`swiss_ai_hub.jambo`**. It adds binary and
+> file-path string-format support on top of upstream. The API is otherwise identical — the upstream docs apply.
+
+**Jambo** is a Python package that automatically converts [JSON Schema](https://json-schema.org/) definitions into [Pydantic](https://docs.pydantic.dev/) models.
 It's designed to streamline schema validation and enforce type safety using Pydantic's validation features.
 
 Created to simplify the process of dynamically generating Pydantic models for AI frameworks like [LangChain](https://www.langchain.com/), [CrewAI](https://www.crewai.com/), and others.
 
 ---
 
-
 ## ✨ Features
 
 - ✅ Convert JSON Schema into Pydantic models dynamically;
 - 🔒 Supports validation for:
-    - strings
-    - integers
-    - floats
-    - booleans
-    - arrays
-    - nested objects
-    - allOf
-    - anyOf
-    - oneOf
-    - ref
-    - enum
-    - const
+  - strings
+  - integers
+  - floats
+  - booleans
+  - arrays
+  - nested objects
+  - allOf
+  - anyOf
+  - oneOf
+  - ref
+  - enum
+  - const
 - ⚙️ Enforces constraints like `minLength`, `maxLength`, `pattern`, `minimum`, `maximum`, `uniqueItems`, and more;
 - 📦 Zero config — just pass your schema and get a model.
 
@@ -50,7 +53,7 @@ Created to simplify the process of dynamically generating Pydantic models for AI
 ## 📦 Installation
 
 ```bash
-pip install jambo
+pip install swiss-ai-hub-jambo
 ```
 
 ---
@@ -64,11 +67,10 @@ There are two ways to build models with Jambo:
 
 The instance API is useful when you want to reuse generated subtypes, inspect cached models, or share caches between converters; all leveraging namespaces via the `$id` property in JSON Schema. See the docs for full details: https://jambo.readthedocs.io/en/latest/usage.ref_cache.html
 
-
 ### Static (compatibility) example
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 schema = {
     "title": "Person",
@@ -90,7 +92,7 @@ print(obj)
 ### Instance API (recommended for cache control)
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 converter = SchemaConverter()
 
@@ -123,7 +125,7 @@ Following are some examples of how to use Jambo to create Pydantic models with v
 ### Strings with constraints
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 
 schema = {
@@ -148,7 +150,7 @@ print(obj)
 ### Integers with bounds
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 
 schema = {
@@ -168,7 +170,7 @@ print(obj)
 ### Nested Objects
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 
 schema = {
@@ -195,7 +197,7 @@ print(obj)
 ### References
 
 ```python
-from jambo import SchemaConverter
+from swiss_ai_hub.jambo import SchemaConverter
 
 
 schema = {

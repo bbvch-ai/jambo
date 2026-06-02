@@ -1,5 +1,5 @@
-from jambo.parser._type_parser import GenericTypeParser
-from jambo.types.type_parser_options import TypeParserOptions
+from swiss_ai_hub.jambo.parser._type_parser import GenericTypeParser
+from swiss_ai_hub.jambo.types.type_parser_options import TypeParserOptions
 
 from typing_extensions import Unpack
 

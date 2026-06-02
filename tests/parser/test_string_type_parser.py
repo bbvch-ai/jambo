@@ -1,5 +1,5 @@
-from jambo.exceptions import InvalidSchemaException
-from jambo.parser import StringTypeParser
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.parser import StringTypeParser
 
 from pydantic import AnyUrl, EmailStr, FilePath
 

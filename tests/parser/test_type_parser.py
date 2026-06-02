@@ -1,6 +1,6 @@
-from jambo.exceptions import InvalidSchemaException
-from jambo.parser import StringTypeParser
-from jambo.parser._type_parser import GenericTypeParser
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException
+from swiss_ai_hub.jambo.parser import StringTypeParser
+from swiss_ai_hub.jambo.parser._type_parser import GenericTypeParser
 
 from unittest import TestCase
 

@@ -1,7 +1,7 @@
-from jambo.exceptions import InternalAssertionException
-from jambo.parser._type_parser import GenericTypeParser
-from jambo.types.json_schema_type import JSONSchema
-from jambo.types.type_parser_options import TypeParserOptions
+from swiss_ai_hub.jambo.exceptions import InternalAssertionException
+from swiss_ai_hub.jambo.parser._type_parser import GenericTypeParser
+from swiss_ai_hub.jambo.types.json_schema_type import JSONSchema
+from swiss_ai_hub.jambo.types.type_parser_options import TypeParserOptions
 
 from pydantic import BaseModel, ConfigDict, Field, create_model
 from pydantic.fields import FieldInfo

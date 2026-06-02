@@ -1,6 +1,6 @@
-from jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
-from jambo.parser import ObjectTypeParser, RefTypeParser
-from jambo.types import JSONSchema, RefCacheDict
+from swiss_ai_hub.jambo.exceptions import InvalidSchemaException, UnsupportedSchemaException
+from swiss_ai_hub.jambo.parser import ObjectTypeParser, RefTypeParser
+from swiss_ai_hub.jambo.types import JSONSchema, RefCacheDict
 
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import validator_for
